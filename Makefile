@@ -1,12 +1,12 @@
 # Compiler flags
 CXX			=g++
-CPPFLAGS	+=-std=c++11 #-Wall
-#CPPFLAGS	+=-static-libgcc -static-libstdc++ 
-CPPFLAGS	+=-ansi -pedantic 
+CPPFLAGS	+=-std=c++11
+CPPFLAGS	+=-Wall
+#CPPFLAGS	+=-static-libgcc -static-libstdc++
 
 # For Debug
-#CPPFLAGS	+=-Wextra
-CPPFLAGS	+=-g
+CPPFLAGS	+=-Wextra -Werror
+#CPPFLAGS	+=-g
 
 # For Optimization
 CPPFLAGS	+=-O4
@@ -19,14 +19,23 @@ CPPFLAGS	+=-O4
 SOURCES		=$(wildcard *.cpp) $(wildcard */*.cpp)
 OBJECTS		=$(SOURCES:.cpp=.o)
 WINOBJECTS	=$(subst /,\,$(OBJECTS))
-EXECUTABLE	=dmsearch
+OUTFOLDER	=output
+EXECUTABLE	=$(OUTFOLDER)/dmsearch
+WINEXE		=$(subst /,\,$(EXECUTABLE)).exe
 
-.PHONY: default clean cleanexe
+.PHONY: default clean cleanexe createfolder
 
-default: cleanexe $(EXECUTABLE)
+default: createfolder clean $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
 		$(CXX) $(CPPFLAGS) -o  $(EXECUTABLE) $(OBJECTS) $(LIBS) $(LDFLAGS)
+
+createfolder:
+ifeq ($(OS),Windows_NT)
+	if not exist "$(OUTFOLDER)" mkdir $(OUTFOLDER)
+else
+	mkdir -p $(OUTFOLDER)
+endif
 
 clean: cleanexe
 ifeq ($(OS),Windows_NT)
@@ -37,7 +46,7 @@ endif
 
 cleanexe:
 ifeq ($(OS),Windows_NT)
-	del $(EXECUTABLE)
+	del $(WINEXE)
 else
 	rm -rf $(EXECUTABLE)
 endif

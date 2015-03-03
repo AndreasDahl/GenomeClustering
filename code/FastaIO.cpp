@@ -1,25 +1,21 @@
 /** @file
 * @Author: Christian Muf
 * @Date:   2015-03-03 01:02:12
-* @Last Modified time: 2015-03-03 01:02:12
-* @Version: 0.0
+* @Last Modified time: 2015-03-03 22:01:02
+* @Version: 1.0
 */
 
 #include "FastaIO.h"
 
-FastaIO::FastaIO()
-{
-	m_readStream = NULL;
-}
-
-FastaIO::FastaIO(const FastaIO& fasta)
-{
-}
+FastaIO::FastaIO() :
+	m_readStream(NULL),
+	m_writeStream(NULL)
+{}
 
 FastaIO::~FastaIO()
 {
 	closeRead();
-	//closeWrite();
+	closeWrite();
 }
 
 void FastaIO::closeRead()
@@ -31,6 +27,18 @@ void FastaIO::closeRead()
 
 		delete m_readStream;
 		m_readStream = NULL;
+	}
+}
+
+void FastaIO::closeWrite()
+{
+	if(m_writeStream != NULL)
+	{
+		if(m_writeStream->is_open())
+			m_writeStream->close();
+
+		delete m_writeStream;
+		m_writeStream = NULL;
 	}
 }
 
@@ -49,6 +57,14 @@ int FastaIO::openRead(const char* filename)
 
 int FastaIO::openWrite(const char* filename)
 {
+	closeWrite();
+	m_writeStream = new std::ofstream(filename);
+
+	if(!m_writeStream->is_open()) {
+		closeRead();
+		return -1;
+	}
+
 	return 0;
 }
 

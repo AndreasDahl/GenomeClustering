@@ -1,7 +1,7 @@
 /** @file
 * @Author: Christian Muf
 * @Date:   2015-03-03 00:59:41
-* @Last Modified time: 2015-03-03 00:59:41
+* @Last Modified time: 2015-03-03 20:30:53
 * @Version: 0.0
 */
 
@@ -34,7 +34,7 @@ int levenshtein(const std::string& s1, const std::string& s2)
 
 	for(x = 1; x < s2len; x++)
 	{
-		column[0] = x+1;
+		prevdiag = column[0] = x+1;
 		s2c = s2[x];
 
 		for(y = 1, lastdiag = x; y <= s1len; y++)
@@ -58,12 +58,12 @@ int main(int argc, char** argv)
 	std::string test1;
 	std::string test2;
 
-	FastaIO fastaIO = FastaIO();
+	FastaIO fastaIO;
 	fastaIO.openRead(argv[1]);
 
 	fastaIO.getNextLine(test1);
 
-	int maxLen = 0;
+	unsigned int maxLen = 0;
 	int maxDif = 0;
 	int minDif = 0;
 	int count = 0;
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
 		if(test2.size() > maxLen) maxLen = test2.size();
 		if(dif > maxDif) maxDif = dif;
 		if(dif < minDif) minDif = dif;
-		if(++count >= 100000) break;
+		if(++count >= 10000) break;
 	}
 
 	std::cout << "Count: " << count << std::endl;
