@@ -1,7 +1,7 @@
 /** @file
 * @Author: Christian Muf
 * @Date:   2015-03-04 13:46:30
-* @Last Modified time: 2015-03-04 20:46:28
+* @Last Modified time: 2015-03-04 20:49:36
 * @Version: 0.0
 */
 
@@ -15,8 +15,7 @@
 class KMerLookup
 {
 	public:
-		KMerLookup();
-		KMerLookup();
+		KMerLookup(const std::string& sequence = "");
 		KMerLookup(const KMerLookup& kMer);
 		~KMerLookup();
 
@@ -29,7 +28,7 @@ class KMerLookup
 		void deleteLookup();
 
 	private:
-		KMerString m_sequence;
+		std::string m_sequence;
 
 		int m_tableLength;
 		int*** m_lookupTable;
