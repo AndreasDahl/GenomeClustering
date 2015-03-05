@@ -7,10 +7,10 @@
 #define K_MEANS_H
 
 #include <vector>
-using std::vector;
+
 #include "KMerString.h"
 
-void kmeans(const vector<KMerString>& data, int k, vector<KMerString>* res);
+void kmeans(const std::vector<KMerString>& data, int k, std::vector<std::vector<KMerString>>& res);
 
 
 #endif

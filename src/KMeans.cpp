@@ -1,4 +1,14 @@
+/** @file
+* @Author: Andreas Dahl
+* @Date:   2015-03-03 01:02:01
+*/
+
 #include "KMeans.h"
+
+#include <algorithm>
+#include <limits>
+
+using std::vector;
 
 static void find_centroid(vector<KMerString>& data, KMerString& best_kmer) {
     float best_distance = std::numeric_limits<float>::infinity();
@@ -14,13 +24,13 @@ static void find_centroid(vector<KMerString>& data, KMerString& best_kmer) {
     }
 }
 
-void kmeans(const vector<KMerString>& data, int k, vector<KMerString> *res) {
+void kmeans(const vector<KMerString>& data, int k, vector<vector<KMerString>>& res) {
     // Initialize Centroids
     vector<KMerString> centroids;
     std::copy_n(data.begin(), k, std::back_inserter(centroids));
     while (true) {
         // Generate new clusters
-        vector<KMerString> *new_clusters = new vector <KMerString>[k];
+        vector<vector<KMerString>> new_clusters(k);
         for (std::vector<KMerString>::const_iterator cur = data.begin(); cur != data.end(); ++cur) {
             // Find closest centroid
             float best_dist = std::numeric_limits<float>::infinity();
@@ -37,11 +47,11 @@ void kmeans(const vector<KMerString>& data, int k, vector<KMerString> *res) {
         }
         // Check If iteration is same
         bool match = true;
-        if (new_clusters->size() != res->size()) {
+        if (new_clusters.size() != res.size()) {
             match = false;
         }
         if (match) {
-            for (unsigned int i = 0; i < new_clusters->size() && match; i++) {
+            for (unsigned int i = 0; i < new_clusters.size() && match; i++) {
                 if (new_clusters[i].size() != res[i].size()) {
                     match = false;
                     break;
@@ -54,9 +64,8 @@ void kmeans(const vector<KMerString>& data, int k, vector<KMerString> *res) {
                 }
             }
         }
-        for (unsigned int i = 0; i < res->size(); ++i)
+        for (unsigned int i = 0; i < res.size(); ++i)
             res[i] = new_clusters[i];
-        delete new_clusters;
 
         // React to match
         if (match) {
@@ -64,7 +73,7 @@ void kmeans(const vector<KMerString>& data, int k, vector<KMerString> *res) {
         }
 
         // Find new centroids
-        for (unsigned int i = 0; i < res->size(); ++i) {
+        for (unsigned int i = 0; i < res.size(); ++i) {
             find_centroid(res[i], centroids[i]);
         }
     }

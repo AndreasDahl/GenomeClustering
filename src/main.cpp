@@ -14,7 +14,7 @@
 
 #include "FastaIO.h"
 #include "KMerString.h"
-#include "Kmeans.h"
+#include "KMeans.h"
 
 #include <iostream>
 #include <vector>
@@ -95,11 +95,10 @@ void kmeans_test(char* file_path) {
 	}
 
 	int k = 3;
-	vector<KMerString>* result = new vector<KMerString>[k];
+	vector<vector<KMerString>> result;
+
 	kmeans(strings, k, result);
-
-	delete result;
-
+	
 	fastaIO.closeRead();
 }
 
