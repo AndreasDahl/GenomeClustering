@@ -3,7 +3,7 @@ rm -f bench.tmp
 
 for x in {1..10}
 do
-    gtime -f "%e" -o bench.txt -a $@
+    time -f "%e" -o output/bench.txt -a $@
 done
 
 awk '
