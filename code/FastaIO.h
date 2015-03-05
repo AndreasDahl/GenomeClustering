@@ -31,6 +31,8 @@ class FastaIO
 	private:
 		std::ifstream* m_readStream;
 		std::ofstream* m_writeStream;
+
+		std::string m_nextString;
 };
 
 #endif

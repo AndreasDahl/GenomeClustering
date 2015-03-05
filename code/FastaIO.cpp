@@ -70,9 +70,15 @@ int FastaIO::openWrite(const char* filename)
 
 int FastaIO::getNextLine(std::string& out)
 {
-	while(std::getline(*m_readStream, out)) {
-		if(out[0] != '>')
+	out = "";
+
+	while(std::getline(*m_readStream, m_nextString)) {
+		if(m_nextString[0] != '>') {
+			out += m_nextString;
+		}
+		else if(out != "") {
 			return 0;
+		}
 	}
 
 	return -1;
