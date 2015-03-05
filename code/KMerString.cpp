@@ -7,6 +7,8 @@
 
 #include "KMerString.h"
 
+#include <math.h>
+
 KMerString::KMerString() :
 	m_sequence(""),
 	m_kMerLength(0),
@@ -23,12 +25,11 @@ KMerString::KMerString(const std::string& sequence) :
 
 KMerString::KMerString(const KMerString& kMer) :
 	m_sequence(kMer.m_sequence),
-	m_kMerLength(kMer.m_kMerLength),
+	m_kMerLength(0),
 	m_kMer(NULL),
 	m_kMerSorted(NULL)
 {
-	if(m_kMerLength > 0)
-		gererateKMer();
+	gererateKMer();
 }
 
 KMerString::~KMerString()
@@ -44,10 +45,14 @@ KMerString& KMerString::operator=(const KMerString& kMer)
 		m_kMer = NULL;
 		m_kMerSorted = NULL;
 
-		if(kMer.m_kMerLength > 0)
-			gererateKMer();
+		gererateKMer();
 	}
 	return *this;
+}
+
+bool KMerString::isGenerated() const
+{
+	return m_sequence.size()-2 == m_kMerLength;
 }
 
 void KMerString::gererateKMer()
@@ -121,3 +126,73 @@ void KMerString::deleteKMer()
 	m_kMer = NULL;
 	m_kMerSorted = NULL;
 }
+
+float kMerDistanceHellinger(const KMerString& kMer1, const KMerString& kMer2)
+{
+	if(!kMer1.isGenerated() || !kMer2.isGenerated())
+		throw -1;
+
+	float hellinger = 0;
+	for(unsigned int i = 0; i < KMerString::c_sortedLength; i++) {
+		float x = (float)kMer1.kMerSorted()[i];
+		float y = (float)kMer2.kMerSorted()[i];
+		hellinger += x + y - 2.0f * sqrt(x * y);
+	}
+
+	return hellinger;
+}
+
+int kMerDistanceManhattan(const KMerString& kMer1, const KMerString& kMer2)
+{
+	if(!kMer1.isGenerated() || !kMer2.isGenerated())
+		throw -1;
+
+	int manhattan = 0;
+	for(unsigned int i = 0; i < KMerString::c_sortedLength; i++)
+		manhattan += abs(kMer1.kMerSorted()[i] - kMer2.kMerSorted()[i]);
+
+	return manhattan;
+}
+
+#define MIN2(a, b) (a) < (b) ? (a) : (b)
+#define MIN3(a, b, c) ((a) < (b) ? ((a) < (c) ? (a) : (c)) : ((b) < (c) ? (b) : (c)))
+int kMerDistanceLevenshtein(const KMerString& kMer1, const KMerString& kMer2)
+{
+	unsigned int s1len, s2len, x, y, lastdiag, olddiag, prevdiag;
+	char s2c;
+
+	const std::string& s1 = kMer1.getSequenceRef();
+	const std::string& s2 = kMer2.getSequenceRef();
+
+	s1len = s1.size();
+	s2len = s2.size();
+
+	unsigned int* column = new unsigned int[s1len+1];
+
+	s2c = s2[0] | 32;
+	for(y = 1, lastdiag = 0; y <= s1len; y++)
+	{
+		olddiag = y;
+		column[y] = MIN2(y, lastdiag + ((s1[y-1] | 32) == s2c ? 0 : 1));
+		lastdiag = olddiag;
+	}
+
+	for(x = 1; x < s2len; x++)
+	{
+		prevdiag = column[0] = x+1;
+
+		s2c = s2[x] | 32;
+
+		for(y = 1, lastdiag = x; y <= s1len; y++)
+		{
+			olddiag = column[y];
+			prevdiag = column[y] = MIN3(olddiag+1, prevdiag+1, lastdiag + ((s1[y-1] | 32) == s2c ? 0 : 1));
+			lastdiag = olddiag;
+		}
+	}
+
+	unsigned int result = column[s1len];
+	delete column;
+	return result;
+}
+

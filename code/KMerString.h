@@ -12,7 +12,8 @@
 
 class KMerString
 {
-	const unsigned int c_sortedLength = 64;
+	public:
+		static const unsigned int c_sortedLength = 64;
 
 	public:
 		KMerString();
@@ -22,10 +23,11 @@ class KMerString
 
 		KMerString& operator=(const KMerString& kMer);
 
+		bool isGenerated() const;
 		void gererateKMer();
 
 		std::string& getSequenceRef();
-		const std::string& getSequenceRef() const;
+		const std::string& getSequenceRef() const; 
 
 		const int* kMer() const;
 		unsigned int kMerLength() const;
@@ -43,5 +45,10 @@ class KMerString
 		int* m_kMer;
 		int* m_kMerSorted;
 };
+
+float kMerDistanceHellinger(const KMerString& kMer1, const KMerString& kMer2);
+int kMerDistanceManhattan(const KMerString& kMer1, const KMerString& kMer2);
+
+int kMerDistanceLevenshtein(const KMerString& kMer1, const KMerString& kMer2);
 
 #endif
