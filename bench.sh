@@ -1,3 +1,4 @@
+#!/bin/sh
 rm -f bench.tmp
 
 for x in {1..10}
