@@ -8,6 +8,7 @@
 #include "KMerString.h"
 
 #include <math.h>
+#include <stdlib.h>
 
 KMerString::KMerString() :
 	m_sequence(""),

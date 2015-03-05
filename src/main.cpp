@@ -14,11 +14,15 @@
 
 #include "FastaIO.h"
 #include "KMerString.h"
+#include "Kmeans.h"
 
 #include <iostream>
+#include <vector>
+using std::vector;
 
 #define MIN2(a, b) (a) < (b) ? (a) : (b)
 #define MIN3(a, b, c) ((a) < (b) ? ((a) < (c) ? (a) : (c)) : ((b) < (c) ? (b) : (c)))
+
 int levenshtein(const std::string& s1, const std::string& s2)
 {
 	unsigned int s1len, s2len, x, y, lastdiag, olddiag, prevdiag;
@@ -78,61 +82,33 @@ void print3mer(std::string& in, int* sum)
 	std::cout << std::endl;
 }
 
+void kmeans_test(char* file_path) {
+	FastaIO fastaIO;
+	fastaIO.openRead(file_path);
+
+	vector<KMerString> strings(100);
+
+	for (std::vector<KMerString>::iterator it = strings.begin(); it != strings.end(); ++it) {
+		fastaIO.getNextLine(it->getSequenceRef());
+		it->gererateKMer();
+		std::cout << "Line " << it->getSequenceRef() << std::endl;
+	}
+
+	int k = 3;
+	vector<KMerString>* result = new vector<KMerString>[k];
+	kmeans(strings, k, result);
+
+	delete result;
+
+	fastaIO.closeRead();
+}
+
 int main(int argc, char** argv)
 {
 	if(argc < 2)
 		return -1;
 
-	KMerString test1;
-	KMerString test2;
-
-	FastaIO fastaIO;
-	fastaIO.openRead(argv[1]);
-
-	fastaIO.getNextLine(test1.getSequenceRef());
-	fastaIO.getNextLine(test2.getSequenceRef());
-
-	test1.gererateKMer();
-	test2.gererateKMer();
-
-	std::cout << test1.getSequenceRef() << std::endl;
-	std::cout << test2.getSequenceRef() << std::endl;
-
-	std::cout << levenshtein(test1.getSequenceRef(), test2.getSequenceRef()) << std::endl;
-
-	float Manhattan = 0;
-	float Hellinger = 0;
-	for(int i = 0; i < 64; i++) {
-		Manhattan += (float)abs(test1.kMerSorted()[i] - test2.kMerSorted()[i]);
-
-		float x = (float)test1.kMerSorted()[i];
-		float y = (float)test2.kMerSorted()[i];
-		Hellinger += x + y - 2.0f * sqrt(x * y);
-	}
-
-	std::cout << "Manhattan: " << Manhattan << std::endl;
-	std::cout << "Hellinger: " << Hellinger << std::endl;
-
-	/*
-	unsigned int maxLen = 0;
-	int maxDif = 0;
-	int minDif = 0;
-	int count = 0;
-	while(!fastaIO.getNextLine(test2)) {
-		int dif = levenshtein(test1, test2);
-		if(test2.size() > maxLen) maxLen = test2.size();
-		if(dif > maxDif) maxDif = dif;
-		if(dif < minDif) minDif = dif;
-		if(++count >= 10000) break;
-	}
-
-	std::cout << "Count: " << count << std::endl;
-	std::cout << "Max length: " << maxLen << std::endl;
-	std::cout << "Max difference: " << maxDif << std::endl;
-	std::cout << "Min difference: " << minDif << std::endl;
-	*/
-
-	fastaIO.closeRead();
+	kmeans_test(argv[1]);
 
 	return 0;
 }

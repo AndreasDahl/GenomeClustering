@@ -10,6 +10,8 @@ set(SOURCE_FILES
     src/KMerLookup.h
     src/KMerString.cpp
     src/KMerString.h
+    src/KMeans.cpp
+    src/KMeans.h
     src/Main.cpp)
 
 add_executable(GenomeClustering ${SOURCE_FILES})
