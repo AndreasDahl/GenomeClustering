@@ -1,8 +1,6 @@
 /** @file
 * @Author: Christian Muf
 * @Date:   2015-03-04 19:43:58
-* @Last Modified time: 2015-03-04 20:19:00
-* @Version: 0.0
 */
 
 #ifndef K_MER_STRING_H

@@ -1,9 +1,9 @@
 /** @file
 * @Author: Christian Muf
 * @Date:   2015-03-04 19:44:05
-* @Last Modified time: 2015-03-04 20:30:43
-* @Version: 0.0
 */
+
+#include "WindowsCompat.h"
 
 #include "KMerString.h"
 

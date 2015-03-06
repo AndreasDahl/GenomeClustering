@@ -1,15 +1,14 @@
 /** @file
 * @Author: Christian Muf
 * @Date:   2015-03-03 00:59:41
-* @Last Modified time: 2015-03-04 20:36:47
-* @Version: 0.0
 */
+
+#include "WindowsCompat.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
 
-#define hypot _hypot
 #include <math.h>
 
 #include "FastaIO.h"
