@@ -5,7 +5,6 @@
 
 #include "KMeans.h"
 
-#include <iostream>
 #include <algorithm>
 #include <limits>
 
@@ -30,7 +29,6 @@ void kmeans(const vector<KMerString>& data, int k, vector<vector<KMerString>>& r
     vector<KMerString> centroids;
     std::copy_n(data.begin(), k, std::back_inserter(centroids));
     while (true) {
-        std::cout << "Iteration" << std::endl;
         // Generate new clusters
         vector<vector<KMerString>> new_clusters(k);
         for (std::vector<KMerString>::const_iterator cur = data.begin(); cur != data.end(); ++cur) {
@@ -45,7 +43,7 @@ void kmeans(const vector<KMerString>& data, int k, vector<vector<KMerString>>& r
                         best_label = i;
                     }
                 } catch (int e) {
-                    std::cout << "error: " << e;
+                    throw e;
                 }
             }
             // add to centroid
@@ -62,11 +60,16 @@ void kmeans(const vector<KMerString>& data, int k, vector<vector<KMerString>>& r
                     match = false;
                     break;
                 }
-                for (unsigned int j = 0; j < new_clusters[i].size(); j++) {
-                    if (0.01 <= kMerDistanceHellinger(new_clusters[i][j], res[i][j])) {
-                        match = false;
-                        break;
+                try {
+                    for (unsigned int j = 0; j < new_clusters[i].size(); j++) {
+                        if (0.01 <= kMerDistanceHellinger(new_clusters[i][j], res[i][j])) {
+                            match = false;
+                            break;
+                        }
+
                     }
+                } catch (int e) {
+                    throw e;
                 }
             }
         }

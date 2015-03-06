@@ -20,68 +20,6 @@
 #include <vector>
 using std::vector;
 
-#define MIN2(a, b) (a) < (b) ? (a) : (b)
-#define MIN3(a, b, c) ((a) < (b) ? ((a) < (c) ? (a) : (c)) : ((b) < (c) ? (b) : (c)))
-
-int levenshtein(const std::string& s1, const std::string& s2)
-{
-	unsigned int s1len, s2len, x, y, lastdiag, olddiag, prevdiag;
-	char s2c;
-
-	s1len = s1.size();
-	s2len = s2.size();
-
-	unsigned int* column = new unsigned int[s1len+1];
-
-	s2c = s2[0] | 32;
-	for(y = 1, lastdiag = 0; y <= s1len; y++)
-	{
-		olddiag = y;
-		column[y] = MIN2(y, lastdiag + ((s1[y-1] | 32) == s2c ? 0 : 1));
-		lastdiag = olddiag;
-	}
-
-	for(x = 1; x < s2len; x++)
-	{
-		prevdiag = column[0] = x+1;
-		s2c = s2[x] | 32;
-
-		for(y = 1, lastdiag = x; y <= s1len; y++)
-		{
-			olddiag = column[y];
-			prevdiag = column[y] = MIN3(olddiag+1, prevdiag+1, lastdiag + ((s1[y-1] | 32) == s2c ? 0 : 1));
-			lastdiag = olddiag;
-		}
-	}
-
-	unsigned int result = column[s1len];
-	delete column;
-	return result;
-}
-
-// U == T
-// Convert 3 chars (acgt/ACGT) to a 6-bit 3-mer char. 
-int char4_3mer(char a, char b, char c)
-{
-	return ((a & 6) >> 1) | ((b & 6) << 1) | ((c & 6) << 3);
-}
-
-void print3mer(std::string& in, int* sum)
-{
-	for(int i = 0; i < 64; i++)
-		sum[i] = 0;
-
-	for(unsigned int i = 0; i < in.size()-2; i++)
-		sum[char4_3mer(in[i], in[i+1], in[i+2])] += 1;
-
-	std::cout << in.size() << " :: ";
-
-	for(int i = 0; i < 64; i++)
-		std::cout << sum[i] << ", ";
-
-	std::cout << std::endl;
-}
-
 void kmeans_test(char* file_path) {
 	FastaIO fastaIO;
 	fastaIO.openRead(file_path);
@@ -106,12 +44,82 @@ void kmeans_test(char* file_path) {
 	fastaIO.closeRead();
 }
 
+void kMerTest1()
+{
+	std::string test1, test2;
+	test1  = "gtatggtgcaagcgttatccggatttactgggtgtaaagggagcgtagacggAAAAGCAAGTC";
+	test1 += "TGGAGTGAAAGCCCGGGGCTCAACCCCGGGACTGCTTTGGAAACTGTTATTCTTGAGTGCCGG";
+	test1 += "AGAGGTAAGCGGAATTCCTAGTGTAGCGGTGAAATGCGTAGATATTAGGAGGAAAACCAGTGG";
+	test1 += "CGAAGGCGGCTTACTGGACGGTAACTGACGTTGaggctcgaaagcgtggggagcaaacagg";
+
+	test2  =    "tgttgcaagcgttatccggatttactgggtgtaaagggagcgtagacggAAAAGCAAGTC"; //
+	test2 += "TGGAGTGAAAGCCCGGGGCTCAACCCCGGGACTGCTTTGGAAACTGTTATTCTTGAGTGCCGG";
+	test2 += "AGAGGTAAGCGGAATTCCTAGTGTAGCGGTGAAATGCGTAGATATTAGGAGGAAAACCAGTGG";
+	test2 += "CGAAGGCGGCTTACTGGACGGTAACTGACGTTGaggctcgaaagcgtggggagcaaac"; //
+
+	KMerString mKer1(test1);
+	KMerString mKer2(test2);
+
+	mKer1.gererateKMer();
+	mKer2.gererateKMer();
+
+	std::cout << "Levenshtein: " << kMerDistanceLevenshtein(mKer1, mKer2) << std::endl;
+	std::cout << "Manhattan: " << kMerDistanceManhattan(mKer1, mKer2) << std::endl;
+	std::cout << "Hellinger: " << kMerDistanceHellinger(mKer1, mKer2) << std::endl;
+	std::cout << "Test: " << kMerDistanceTest(mKer1, mKer2) << std::endl;
+}
+
+void kMerTest2(char* filePath)
+{
+	FastaIO fastaIO;
+	fastaIO.openRead(filePath);
+
+	KMerString mKer1, mKer2;
+
+	fastaIO.getNextLine(mKer1.getSequenceRef());
+	mKer1.gererateKMer();
+
+	long mean = 0.0;
+	long counter = 1;
+	int max = 0;
+	std::string maxString;
+	while(!fastaIO.getNextLine(mKer2.getSequenceRef()) && counter < 100000)
+	{
+		mKer2.gererateKMer();
+		mean += (long)mKer2.getSequenceRef().size();
+
+		int temp = kMerDistanceTest(mKer1, mKer2);
+
+		if(temp > max) {
+			max = temp;
+			maxString = mKer2.getSequenceRef();
+		}
+
+		counter += 1;
+	}
+
+	mKer2.getSequenceRef() = maxString;
+	mKer2.gererateKMer();
+
+	std::cout << "Count: " << counter << std::endl;
+	std::cout << "Mean: " << mean / counter << std::endl;
+	std::cout << "Max differnce: " << max << std::endl;
+	std::cout << "Max differnce real: " << kMerDistanceLevenshtein(mKer1, mKer2) << std::endl;
+	std::cout << std::endl << mKer1.getSequenceRef() << std::endl;
+	std::cout << std::endl << mKer2.getSequenceRef() << std::endl;
+
+	fastaIO.closeRead();
+}
+
 int main(int argc, char** argv)
 {
 	if(argc < 2)
 		return -1;
 
-	kmeans_test(argv[1]);
+	//kmeans_test(argv[1]);
+
+	//kMerTest1();
+	kMerTest2(argv[1]);
 
 	return 0;
 }

@@ -9,6 +9,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <limits>
 
 KMerString::KMerString() :
 	m_sequence(""),
@@ -128,6 +129,64 @@ void KMerString::deleteKMer()
 	m_kMerSorted = NULL;
 }
 
+int kMerDistanceTest(const KMerString& kMer1, const KMerString& kMer2)
+{
+	if(!kMer1.isGenerated() || !kMer2.isGenerated())
+		throw -1;
+
+	if(kMer1.kMerLength() == kMer2.kMerLength())
+	{
+		int manhattan = 0;
+		for(unsigned int i = 0; i < KMerString::c_sortedLength; i++)
+			manhattan += abs(kMer1.kMerSorted()[i] - kMer2.kMerSorted()[i]);
+
+		return manhattan;
+	}
+
+	const int* big;
+	const int* smallSorted;
+	unsigned int bigLength, smallLength;
+
+	if(kMer1.kMerLength() > kMer2.kMerLength()) {
+		big = kMer1.kMer();
+		bigLength = kMer1.kMerLength();
+		smallSorted = kMer2.kMerSorted();
+		smallLength = kMer2.kMerLength();
+	}
+	else {
+		big = kMer2.kMer();
+		bigLength = kMer2.kMerLength();
+		smallSorted = kMer1.kMerSorted();
+		smallLength = kMer1.kMerLength();
+	}
+
+	int sorted[KMerString::c_sortedLength];
+	unsigned int lengthDiff = bigLength - smallLength;
+	int bestResult = std::numeric_limits<int>::max();
+
+	for(unsigned int i = 0; i < KMerString::c_sortedLength; i++)
+		sorted[i] = 0;
+
+	for(unsigned int i = 0; i < smallLength-1; i++) // Hurtigere minus oprindelige?
+		sorted[big[i]] += 1;
+
+	for(unsigned int i = 0; i < lengthDiff; i++)
+	{
+		sorted[big[(smallLength-1)+i]] += 1;
+
+		int manhattan = 0;
+		for(unsigned int j = 0; j < KMerString::c_sortedLength; j++)
+			manhattan += abs(sorted[j] - smallSorted[j]);
+
+		if(manhattan < bestResult)
+			bestResult = manhattan;
+
+		sorted[big[i]] -= 1;
+	}
+
+	return bestResult;
+}
+
 float kMerDistanceHellinger(const KMerString& kMer1, const KMerString& kMer2)
 {
 	if(!kMer1.isGenerated() || !kMer2.isGenerated())
@@ -194,6 +253,6 @@ int kMerDistanceLevenshtein(const KMerString& kMer1, const KMerString& kMer2)
 
 	unsigned int result = column[s1len];
 	delete column;
-	return result;
+	return result - abs(s1len - s2len);
 }
 
