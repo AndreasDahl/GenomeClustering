@@ -95,7 +95,7 @@ void kmeans_test(char* file_path) {
 	}
 
 	int k = 3;
-	vector<vector<KMerString>> result;
+	vector<vector<KMerString>> result(k);
 
 	kmeans(strings, k, result);
 	

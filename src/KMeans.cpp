@@ -5,6 +5,7 @@
 
 #include "KMeans.h"
 
+#include <iostream>
 #include <algorithm>
 #include <limits>
 
@@ -29,6 +30,7 @@ void kmeans(const vector<KMerString>& data, int k, vector<vector<KMerString>>& r
     vector<KMerString> centroids;
     std::copy_n(data.begin(), k, std::back_inserter(centroids));
     while (true) {
+        std::cout << "Iteration";
         // Generate new clusters
         vector<vector<KMerString>> new_clusters(k);
         for (std::vector<KMerString>::const_iterator cur = data.begin(); cur != data.end(); ++cur) {
@@ -36,10 +38,14 @@ void kmeans(const vector<KMerString>& data, int k, vector<vector<KMerString>>& r
             float best_dist = std::numeric_limits<float>::infinity();
             int best_label = -1;
             for (unsigned int i = 0; i != centroids.size(); i++) {
-                float tmp_dist = kMerDistanceHellinger(*cur, centroids[i]);
-                if (tmp_dist < best_dist) {
-                    best_dist = tmp_dist;
-                    best_label = i;
+                try {
+                    float tmp_dist = kMerDistanceHellinger(*cur, centroids[i]);
+                    if (tmp_dist < best_dist) {
+                        best_dist = tmp_dist;
+                        best_label = i;
+                    }
+                } catch (int e) {
+                    std::cout << "error: " << e;
                 }
             }
             // add to centroid
@@ -47,17 +53,21 @@ void kmeans(const vector<KMerString>& data, int k, vector<vector<KMerString>>& r
         }
         // Check If iteration is same
         bool match = true;
+        std::cout << "new: " << new_clusters.size() << std::endl;
+        std::cout << "res: " << res.size() << std::endl;
         if (new_clusters.size() != res.size()) {
             match = false;
         }
         if (match) {
             for (unsigned int i = 0; i < new_clusters.size() && match; i++) {
+                std::cout << "new: " << new_clusters[i].size() << std::endl;
+                std::cout << "res: " << res[i].size() << std::endl;
                 if (new_clusters[i].size() != res[i].size()) {
                     match = false;
                     break;
                 }
                 for (unsigned int j = 0; i < new_clusters[i].size(); i++) {
-                    if (0 == kMerDistanceHellinger(new_clusters[i][j], res[i][j])) {
+                    if (0.1 <= kMerDistanceHellinger(new_clusters[i][j], res[i][j])) {
                         match = false;
                         break;
                     }
@@ -76,6 +86,9 @@ void kmeans(const vector<KMerString>& data, int k, vector<vector<KMerString>>& r
         for (unsigned int i = 0; i < res.size(); ++i) {
             find_centroid(res[i], centroids[i]);
         }
+
+        std::cout << std::endl;
+        std::cout.flush();
     }
 }
 
