@@ -28,6 +28,7 @@ class KMerString
 
 		std::string& getSequenceRef();
 		const std::string& getSequenceRef() const; 
+		unsigned int getSequenceLength() const;
 
 		const int* kMer() const;
 		unsigned int kMerLength() const;

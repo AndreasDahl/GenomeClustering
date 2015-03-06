@@ -19,6 +19,8 @@
 #include <iostream>
 #include <vector>
 using std::vector;
+#include <list>
+using std::list;
 
 void kmeans_test(char* file_path) {
 	FastaIO fastaIO;
@@ -111,6 +113,43 @@ void kMerTest2(char* filePath)
 	fastaIO.closeRead();
 }
 
+void findBiggest(char* filename)
+{
+	FastaIO fastaIO;
+	fastaIO.openRead(filename);
+
+	int limit = 10000;
+	int count = 0;
+
+	KMerString kMer;
+	list<KMerString> strings;
+	list<KMerString>::iterator it;
+
+	while(!fastaIO.getNextLine(kMer.getSequenceRef()))
+	{
+		if(count < limit || strings.front().getSequenceLength() < kMer.getSequenceLength())
+		{
+			bool notFound = true;
+			for(list<KMerString>::iterator it = strings.begin(); it != strings.end(); ++it)
+			{
+				if(it->getSequenceLength() > kMer.getSequenceLength())
+				{
+					notFound = false;
+					strings.insert(++it, kMer);
+					break;
+				}
+			}
+			if(notFound) strings.push_back(kMer);
+			if(++count > limit) strings.pop_front();
+		}
+	}
+
+	std::cout << "Small: " << strings.front().getSequenceLength() << std::endl;
+	std::cout << "Big: " << strings.back().getSequenceLength() << std::endl;
+
+	fastaIO.closeRead();
+}
+
 int main(int argc, char** argv)
 {
 	if(argc < 2)
@@ -119,7 +158,9 @@ int main(int argc, char** argv)
 	//kmeans_test(argv[1]);
 
 	//kMerTest1();
-	kMerTest2(argv[1]);
+	//kMerTest2(argv[1]);
+
+	findBiggest(argv[1]);
 
 	return 0;
 }

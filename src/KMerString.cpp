@@ -95,6 +95,11 @@ const std::string& KMerString::getSequenceRef() const
 	return m_sequence;
 }
 
+unsigned int KMerString::getSequenceLength() const
+{
+	return m_sequence.size();
+}
+
 const int* KMerString::kMer() const
 {
 	return m_kMer;
