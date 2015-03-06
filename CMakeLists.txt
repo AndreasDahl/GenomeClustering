@@ -6,8 +6,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(SOURCE_FILES
     src/FastaIO.cpp
     src/FastaIO.h
-    src/KMerLookup.cpp
-    src/KMerLookup.h
     src/KMerString.cpp
     src/KMerString.h
     src/KMeans.cpp

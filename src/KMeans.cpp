@@ -36,14 +36,10 @@ void kmeans(const vector<KMerString>& data, int k, vector<vector<KMerString>>& r
             float best_dist = std::numeric_limits<float>::infinity();
             int best_label = -1;
             for (unsigned int i = 0; i != centroids.size(); i++) {
-                try {
-                    float tmp_dist = kMerDistanceHellinger(*cur, centroids[i]);
-                    if (tmp_dist < best_dist) {
-                        best_dist = tmp_dist;
-                        best_label = i;
-                    }
-                } catch (int e) {
-                    throw e;
+                float tmp_dist = kMerDistanceHellinger(*cur, centroids[i]);
+                if (tmp_dist < best_dist) {
+                    best_dist = tmp_dist;
+                    best_label = i;
                 }
             }
             // add to centroid
@@ -60,16 +56,12 @@ void kmeans(const vector<KMerString>& data, int k, vector<vector<KMerString>>& r
                     match = false;
                     break;
                 }
-                try {
-                    for (unsigned int j = 0; j < new_clusters[i].size(); j++) {
-                        if (0.01 <= kMerDistanceHellinger(new_clusters[i][j], res[i][j])) {
-                            match = false;
-                            break;
-                        }
-
+                for (unsigned int j = 0; j < new_clusters[i].size(); j++) {
+                    if (0.01 <= kMerDistanceHellinger(new_clusters[i][j], res[i][j])) {
+                        match = false;
+                        break;
                     }
-                } catch (int e) {
-                    throw e;
+
                 }
             }
         }
