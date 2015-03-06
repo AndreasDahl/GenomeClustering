@@ -86,19 +86,23 @@ void kmeans_test(char* file_path) {
 	FastaIO fastaIO;
 	fastaIO.openRead(file_path);
 
-	vector<KMerString> strings(100);
+	vector<KMerString> strings(1000);
 
 	for (std::vector<KMerString>::iterator it = strings.begin(); it != strings.end(); ++it) {
 		fastaIO.getNextLine(it->getSequenceRef());
 		it->gererateKMer();
-		std::cout << "Line " << it->getSequenceRef() << std::endl;
 	}
 
-	int k = 3;
+	int k = 5;
 	vector<vector<KMerString>> result(k);
 
 	kmeans(strings, k, result);
-	
+
+	// Print resulting clusters
+	for (unsigned int i = 0; i < result.size(); ++i) {
+		std::cout << "Cluster nr: " << i << " with " << result[i].size() << " strings" << std::endl;
+	}
+
 	fastaIO.closeRead();
 }
 

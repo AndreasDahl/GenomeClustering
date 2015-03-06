@@ -30,7 +30,7 @@ void kmeans(const vector<KMerString>& data, int k, vector<vector<KMerString>>& r
     vector<KMerString> centroids;
     std::copy_n(data.begin(), k, std::back_inserter(centroids));
     while (true) {
-        std::cout << "Iteration";
+        std::cout << "Iteration" << std::endl;
         // Generate new clusters
         vector<vector<KMerString>> new_clusters(k);
         for (std::vector<KMerString>::const_iterator cur = data.begin(); cur != data.end(); ++cur) {
@@ -53,21 +53,17 @@ void kmeans(const vector<KMerString>& data, int k, vector<vector<KMerString>>& r
         }
         // Check If iteration is same
         bool match = true;
-        std::cout << "new: " << new_clusters.size() << std::endl;
-        std::cout << "res: " << res.size() << std::endl;
         if (new_clusters.size() != res.size()) {
             match = false;
         }
         if (match) {
             for (unsigned int i = 0; i < new_clusters.size() && match; i++) {
-                std::cout << "new: " << new_clusters[i].size() << std::endl;
-                std::cout << "res: " << res[i].size() << std::endl;
                 if (new_clusters[i].size() != res[i].size()) {
                     match = false;
                     break;
                 }
-                for (unsigned int j = 0; i < new_clusters[i].size(); i++) {
-                    if (0.1 <= kMerDistanceHellinger(new_clusters[i][j], res[i][j])) {
+                for (unsigned int j = 0; j < new_clusters[i].size(); j++) {
+                    if (0.01 <= kMerDistanceHellinger(new_clusters[i][j], res[i][j])) {
                         match = false;
                         break;
                     }
@@ -76,19 +72,14 @@ void kmeans(const vector<KMerString>& data, int k, vector<vector<KMerString>>& r
         }
         for (unsigned int i = 0; i < res.size(); ++i)
             res[i] = new_clusters[i];
-
-        // React to match
+        // Return if iteration same as last
         if (match) {
             return;
         }
-
         // Find new centroids
         for (unsigned int i = 0; i < res.size(); ++i) {
             find_centroid(res[i], centroids[i]);
         }
-
-        std::cout << std::endl;
-        std::cout.flush();
     }
 }
 
