@@ -1,8 +1,6 @@
 /** @file
 * @Author: Christian Muf
 * @Date:   2015-03-03 01:02:12
-* @Last Modified time: 2015-03-03 22:01:02
-* @Version: 1.0
 */
 
 #include "FastaIO.h"

@@ -1,8 +1,6 @@
 /** @file
 * @Author: Christian Muf
 * @Date:   2015-03-03 01:02:01
-* @Last Modified time: 2015-03-03 22:00:54
-* @Version: 1.0
 */
 
 #ifndef FASTA_IO_H
