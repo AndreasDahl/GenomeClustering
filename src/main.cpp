@@ -52,21 +52,15 @@ void simpleGreedyClusteringTest(char* file_path) {
 	FastaIO fastaIO;
 	fastaIO.openRead(file_path);
 
-	vector<KMerString> strings(1000);
+	vector<KMerString> strings;
 
-	for (std::vector<KMerString>::iterator it = strings.begin(); it != strings.end(); ++it) {
-		fastaIO.getNextLine(it->getSequenceRef());
-		it->gererateKMer();
+	std::string str;
+	while (!fastaIO.getNextLine(str)) {
+		strings.push_back(KMerString(str));
+		strings.back().gererateKMer();
 	}
 
-	vector<vector<KMerString>> result;
-
-	simpleGreedyClustering<KMerString>(strings, kMerDistanceHellinger, 6.0f, result);
-
-	// Print resulting clusters
-	for (unsigned int i = 0; i < result.size(); ++i) {
-		std::cout << "Cluster nr: " << i << " with " << result[i].size() << " strings" << std::endl;
-	}
+	simpleGreedyClustering<KMerString>(strings, kMerDistanceHellinger, 6.0f);
 
 	fastaIO.closeRead();
 }
@@ -184,7 +178,7 @@ int main(int argc, char** argv)
 //	kMerTest1();
 //	kMerTest2(argv[1]);
 //	findBiggest(argv[1]);
-//	simpleGreedyClusteringTest(argv[1]);
+	simpleGreedyClusteringTest(argv[1]);
 
 
 	return 0;

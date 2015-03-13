@@ -11,35 +11,66 @@
 #include <algorithm>
 #include <limits>
 #include <iostream>
+#include <list>
 
 #include "KMerString.h"
 
 template <typename T>
-void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T const &, T const &), float similarity, std::vector<std::vector<T>>& res) {
-    std::vector<T> centroids;
+void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T const &, T const &), float similarity) {
+    std::list<T> centroids;
+    std::cout << data.size();
+    int c_count = 0;
     int n = 0;
     for (typename std::vector<T>::iterator current = data.begin(); current != data.end(); ++current) {
-        if (++n % 100 == 0) {
+        // Output progress FIXME: Move somewhere else.
+        if (++n % 10000 == 0) {
             std::cout << n << std::endl;
             std::cout.flush();
         }
-        std::cout.flush();
         float bestDist = std::numeric_limits<float>::infinity();
-        int bestIndex;
-        for (int i = 0; i < centroids.size(); ++i) {
-            float distance = dist(*current, centroids[i]);
-            if (distance < bestDist) {
+        for (typename std::list<T>::iterator it = centroids.begin(); it != centroids.end(); ++it) {
+            float distance = dist(*current, *it);
+            if (distance < similarity) {
                 bestDist = distance;
-                bestIndex = i;
+                break;
             }
         }
         if (bestDist > similarity) {
-            centroids.push_back(*current);
-            res.push_back({*current});
+            // Only keep "N" centroids.
+            if (centroids.size() >= 32) {
+                centroids.pop_back();
+            }
+            centroids.push_front(*current);
+            c_count++;
+//            std::cout
+//                    << "S\t"
+//                    << centroids.size() - 1 << "\t"
+//                    << "SIZE\t"
+//                    << "*\t"
+//                    << "*\t"
+//                    << "*\t"
+//                    << "*\t"
+//                    << "*\t"
+//                    << "Name_" << n << "\t"
+//                    << "*";
         } else {
-            res[bestIndex].push_back(*current);
+//            std::cout
+//                    << "H\t"
+//                    << bestIndex << "\t"
+//                    << "SIZE\t"
+//                    << bestDist << "\t" // TODO: Percentage value
+//                    << "+\t"            // TODO: Determine Strand
+//                    << "*\t"            // TODO: 0-based coordinate of alignment start in the query sequence.
+//                    << "*\t"            // TODO: 0-based coordinate of alignment start in target (seed) sequence.
+//                                        //       If minus strand, Tlo is relative to start of reverse-complemented target.
+//                    << "*\t"            // TODO: Alignment?
+//                    << "Name_" << n << "\t"
+//                    << "Name_" << bestIndex;
         }
+//        std::cout << std::endl;
+//        std::cout.flush();
     }
+    std::cout << "Cluster Count:" << c_count;
 }
 
 #endif

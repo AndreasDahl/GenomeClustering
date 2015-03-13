@@ -32,6 +32,6 @@
 .idea/
 
 # Folders
-output/
+out/
 doc/
 res/
