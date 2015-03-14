@@ -22,7 +22,19 @@
 
 using std::vector;
 #include <list>
+#include <sys/time.h>
+
 using std::list;
+
+typedef unsigned long long timestamp_t;
+
+static timestamp_t
+get_timestamp ()
+{
+	struct timeval now;
+	gettimeofday (&now, NULL);
+	return  now.tv_usec + (timestamp_t)now.tv_sec * 1000000;
+}
 
 void kmeans_test(char* file_path) {
 	FastaIO fastaIO;
@@ -60,7 +72,11 @@ void simpleGreedyClusteringTest(char* file_path) {
 		strings.back().gererateKMer();
 	}
 
+	timestamp_t t0 = get_timestamp();
 	simpleGreedyClustering<KMerString>(strings, kMerDistanceHellinger, 6.0f);
+	timestamp_t t1 = get_timestamp();
+
+	std::cout << "Time: " << (t1 - t0) / 1000000.0L;
 
 	fastaIO.closeRead();
 }
