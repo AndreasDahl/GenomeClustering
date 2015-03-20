@@ -20,31 +20,18 @@
 
 using std::vector;
 #include <list>
+#include <sys/time.h>
+
 using std::list;
 
-/*void kmeans_test(char* file_path) {
-	FastaIO fastaIO;
-	fastaIO.openRead(file_path);
+typedef unsigned long long timestamp_t;
 
-	vector<KMerString> strings(1000);
-
-	for (std::vector<KMerString>::iterator it = strings.begin(); it != strings.end(); ++it) {
-		fastaIO.getNextLine(it->getSequenceRef());
-		it->gererateKMer();
-	}
-
-	int k = 5;
-	vector<vector<KMerString>> result(k);
-
-	kmeans(strings, k, result);
-
-	// Print resulting clusters
-	for (unsigned int i = 0; i < result.size(); ++i) {
-		std::cout << "Cluster nr: " << i << " with " << result[i].size() << " strings" << std::endl;
-	}
-
-	fastaIO.closeRead();
-}*/
+static timestamp_t get_timestamp()
+{
+	struct timeval now;
+	gettimeofday (&now, NULL);
+	return  now.tv_usec + (timestamp_t)now.tv_sec * 1000000;
+}
 
 void simpleGreedyClusteringTest(char* file_path) {
 	FastaIO fastaIO;
@@ -52,6 +39,7 @@ void simpleGreedyClusteringTest(char* file_path) {
 
 	vector<FastaContainer> strings;
 
+	timestamp_t t0 = get_timestamp();
 	while (true) {
 		strings.push_back(FastaContainer());
 		if(fastaIO.getNextLine(strings.back())) {
@@ -61,6 +49,9 @@ void simpleGreedyClusteringTest(char* file_path) {
 	}
 
 	simpleGreedyClustering<FastaContainer>(strings, mufDifference, 0.03f);
+	timestamp_t t1 = get_timestamp();
+
+	std::cout << (t1 - t0) / 1000000.0L << std::endl;
 
 	fastaIO.closeRead();
 }
@@ -70,12 +61,7 @@ int main(int argc, char** argv)
 	if(argc < 2)
 		return -1;
 
-//	kmeans_test(argv[1]);
-//	kMerTest1();
-//	kMerTest2(argv[1]);
-//	findBiggest(argv[1]);
 	simpleGreedyClusteringTest(argv[1]);
-
 
 	return 0;
 }
