@@ -19,7 +19,7 @@ CPPFLAGS	+=-O4
 SOURCES		=$(wildcard *.cpp) $(wildcard */*.cpp)
 OBJECTS		=$(SOURCES:.cpp=.o)
 WINOBJECTS	=$(subst /,\,$(OBJECTS))
-OUTFOLDER	=output
+OUTFOLDER	=out
 EXECUTABLE	=$(OUTFOLDER)/dmsearch
 WINEXE		=$(subst /,\,$(EXECUTABLE)).exe
 

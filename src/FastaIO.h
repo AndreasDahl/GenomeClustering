@@ -9,6 +9,20 @@
 #include <fstream>
 #include <string>
 
+struct FastaContainer
+{
+	std::string sequence;
+	unsigned long lineNumber;
+	int* kMer;
+	unsigned int k; // Size of k
+	FastaContainer() {
+		sequence = "";
+		lineNumber = 0;
+		kMer = NULL;
+		k = -1;
+	}
+};
+
 class FastaIO
 {
 	public:
@@ -24,13 +38,18 @@ class FastaIO
 		int openRead(const char* filename);
 		int openWrite(const char* filename);
 
-		int getNextLine(std::string& out);
+		bool readIsOpen() const;
+		bool writeIsOpen() const;
+
+		void writeAsync();
+
+		int getNextLine(FastaContainer& out);
 
 	private:
 		std::ifstream* m_readStream;
 		std::ofstream* m_writeStream;
 
-		std::string m_nextString;
+		unsigned int m_nextLineNumber;
 };
 
 #endif
