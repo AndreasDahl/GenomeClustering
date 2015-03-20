@@ -50,7 +50,7 @@ int kMerDistanceTest(const KMerString& kMer1, const KMerString& kMer2);
 float kMerDistanceHellinger(const KMerString& kMer1, const KMerString& kMer2);
 int kMerDistanceManhattan(const KMerString& kMer1, const KMerString& kMer2);
 
-int kMerDistanceLevenshtein(const KMerString& kMer1, const KMerString& kMer2);
+float kMerDistanceLevenshtein(const KMerString& kMer1, const KMerString& kMer2);
 
 
 #endif

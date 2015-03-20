@@ -221,7 +221,7 @@ int kMerDistanceManhattan(const KMerString& kMer1, const KMerString& kMer2)
 
 #define MIN2(a, b) (a) < (b) ? (a) : (b)
 #define MIN3(a, b, c) ((a) < (b) ? ((a) < (c) ? (a) : (c)) : ((b) < (c) ? (b) : (c)))
-int kMerDistanceLevenshtein(const KMerString& kMer1, const KMerString& kMer2)
+float kMerDistanceLevenshtein(const KMerString& kMer1, const KMerString& kMer2)
 {
 	unsigned int s1len, s2len, x, y, lastdiag, olddiag, prevdiag;
 	char s2c;
@@ -258,6 +258,6 @@ int kMerDistanceLevenshtein(const KMerString& kMer1, const KMerString& kMer2)
 
 	unsigned int result = column[s1len];
 	delete column;
-	return result - abs(s1len - s2len);
+	return (float)(result - abs(s1len - s2len)) / (float)(s1len < s2len ? s1len : s2len);
 }
 
