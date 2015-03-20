@@ -7,7 +7,8 @@
 
 FastaIO::FastaIO() :
 	m_readStream(NULL),
-	m_writeStream(NULL)
+	m_writeStream(NULL),
+	m_nextLineNumber(0)
 {}
 
 FastaIO::~FastaIO()
@@ -45,6 +46,8 @@ int FastaIO::openRead(const char* filename)
 	closeRead();
 	m_readStream = new std::ifstream(filename);
 
+	m_nextLineNumber = 1;
+
 	if(!m_readStream->is_open()) {
 		closeRead();
 		return -1;
@@ -66,15 +69,33 @@ int FastaIO::openWrite(const char* filename)
 	return 0;
 }
 
-int FastaIO::getNextLine(std::string& out)
+bool FastaIO::readIsOpen() const
 {
-	out = "";
+	return m_readStream != NULL;
+}
 
-	while(std::getline(*m_readStream, m_nextString)) {
-		if(m_nextString[0] != '>') {
-			out += m_nextString;
+bool FastaIO::writeIsOpen() const
+{
+	return m_writeStream != NULL;
+}
+
+int FastaIO::getNextLine(FastaContainer& out)
+{
+	std::string str;
+
+	out.sequence = "";
+	out.lineNumber = 0;
+
+	while(std::getline(*m_readStream, str))
+	{
+		if(str[0] != '>') {
+			out.sequence += str;
+			if(out.lineNumber == 0) {
+				out.lineNumber = m_nextLineNumber;
+			}
+			m_nextLineNumber += 1;
 		}
-		else if(out != "") {
+		else if(out.sequence != "") {
 			return 0;
 		}
 	}

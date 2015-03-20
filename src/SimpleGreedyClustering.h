@@ -13,12 +13,10 @@
 #include <iostream>
 #include <list>
 
-#include "KMerString.h"
-
 template <typename T>
-void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T const &, T const &), float similarity) {
+void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T  &, T  &), float similarity) {
     std::list<T> centroids;
-    std::cout << data.size();
+    std::cout << data.size() << std::endl;
     int c_count = 0;
     int n = 0;
     for (typename std::vector<T>::iterator current = data.begin(); current != data.end(); ++current) {
@@ -70,7 +68,7 @@ void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T const &, T con
 //        std::cout << std::endl;
 //        std::cout.flush();
     }
-    std::cout << "Cluster Count:" << c_count;
+    std::cout << "Cluster Count:" << c_count << std::endl << std::endl;
 }
 
 #endif

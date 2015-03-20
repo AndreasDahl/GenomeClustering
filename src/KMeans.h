@@ -8,9 +8,9 @@
 
 #include <vector>
 
-#include "KMerString.h"
+#include "FastaIO.h"
 
-void kmeans(const std::vector<KMerString>& data, int k, std::vector<std::vector<KMerString>>& res);
+void kmeans(std::vector<FastaContainer>& data, int k, std::vector<std::vector<FastaContainer>>& res);
 
 
 #endif
