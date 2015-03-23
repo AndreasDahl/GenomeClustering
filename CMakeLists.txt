@@ -12,6 +12,8 @@ set(SOURCE_FILES
     src/Main.cpp
     src/SimpleGreedyClustering.h
     src/MufDifference.h
-    src/MufDifference.cpp)
+    src/MufDifference.cpp
+    src/PrintUtils.h
+    src/PrintUtils.cpp)
 
 add_executable(GenomeClustering ${SOURCE_FILES})

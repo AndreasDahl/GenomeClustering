@@ -12,6 +12,7 @@
 #include <limits>
 #include <iostream>
 #include <list>
+#include "PrintUtils.h"
 
 struct SimpleGreedySettings {
     bool greedyPick = true;
@@ -31,9 +32,8 @@ void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T  &, T  &), Sim
     int n = 0;
     for (typename std::vector<T>::iterator current = data.begin(); current != data.end(); ++current) {
         // Output progress FIXME: Move somewhere else.
-        if (++n % 100 == 0) {
-            std::cout << n << std::endl;
-            std::cout.flush();
+        if (++n % 1000 == 0) {
+            printProgress((float)(n) / data.size());
         }
         float bestDist = std::numeric_limits<float>::infinity();
         typename std::list<T*>::iterator it;
@@ -58,7 +58,7 @@ void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T  &, T  &), Sim
             centroids.push_front(*it);
         }
     }
-    std::cout << "Cluster Count:" << c_count << std::endl << std::endl;
+    std::cout << "\r" << "Cluster Count:" << c_count << std::endl << std::endl;
 }
 
 #endif
