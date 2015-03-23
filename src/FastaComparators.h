@@ -9,7 +9,7 @@
 
 struct LengthThenKmer
 {
-    static inline bool less_than(const FastaContainer& fa1, const FastaContainer& fa2)
+    static bool less_than(const FastaContainer& fa1, const FastaContainer& fa2)
     {
         unsigned int permutations = 1 << (fa1.k << 1); // 4^k == 2^(k*2)
         if (fa1.sequence.size() < fa2.sequence.size()) {
@@ -24,14 +24,14 @@ struct LengthThenKmer
         return false;
     }
 
-    static inline bool greater_than(const FastaContainer& fa1, const FastaContainer& fa2) {
+    static bool greater_than(const FastaContainer& fa1, const FastaContainer& fa2) {
         return LengthThenKmer::less_than(fa2, fa1);
     }
 };
 
 struct Kmer
 {
-    static inline bool less_than(const FastaContainer& fa1, const FastaContainer& fa2)
+    static bool less_than(const FastaContainer& fa1, const FastaContainer& fa2)
     {
         unsigned int permutations = 1 << (fa1.k << 1); // 4^k == 2^(k*2)
         for (unsigned int i = 0; i < permutations; ++i) {
@@ -42,7 +42,7 @@ struct Kmer
         return false;
     }
 
-    static inline bool greater_than(const FastaContainer& fa1, const FastaContainer& fa2) {
+    static bool greater_than(const FastaContainer& fa1, const FastaContainer& fa2) {
         return Kmer::less_than(fa2, fa1);
     }
 };
