@@ -51,9 +51,9 @@ void simpleGreedyClusteringTest(char* file_path) {
 	std::sort(strings.begin(), strings.end(), Kmer::greater_than);
 
 	SimpleGreedySettings settings = SimpleGreedySettings(0.03f);
-	settings.greedyPick = true;
-	settings.cacheSize = UINT_MAX;
-	simpleGreedyClustering<FastaContainer>(strings, kMerDistanceLevenshtein, settings);
+//	settings.greedyPick = true;
+//	settings.cacheSize = 64;
+	simpleGreedyClustering<FastaContainer>(strings, mufDifference, settings);
 	timestamp_t t1 = get_timestamp();
 
 	std::cout << (t1 - t0) / 1000000.0L << std::endl;
