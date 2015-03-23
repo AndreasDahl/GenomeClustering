@@ -9,6 +9,7 @@
 #include <string>
 
 #include <math.h>
+#include <sys/time.h>
 
 #include "FastaIO.h"
 #include "MufDifference.h"
@@ -19,8 +20,6 @@
 #include <vector>
 
 using std::vector;
-#include <list>
-#include <sys/time.h>
 
 using std::list;
 
@@ -48,7 +47,10 @@ void simpleGreedyClusteringTest(char* file_path) {
 		}
 	}
 
-	simpleGreedyClustering<FastaContainer>(strings, mufDifference, 0.03f);
+	SimpleGreedySettings settings = SimpleGreedySettings(0.03f);
+	settings.greedyPick = true;
+	settings.cacheSize = UINT_MAX;
+	simpleGreedyClustering<FastaContainer>(strings, kMerDistanceLevenshtein, settings);
 	timestamp_t t1 = get_timestamp();
 
 	std::cout << (t1 - t0) / 1000000.0L << std::endl;
