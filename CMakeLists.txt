@@ -7,11 +7,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/out")
 set(SOURCE_FILES
     src/FastaIO.cpp
     src/FastaIO.h
-    src/KMerString.cpp
-    src/KMerString.h
     src/KMeans.cpp
     src/KMeans.h
     src/Main.cpp
-    src/SimpleGreedyClustering.h)
+    src/SimpleGreedyClustering.h
+    src/MufDifference.h
+    src/MufDifference.cpp)
 
 add_executable(GenomeClustering ${SOURCE_FILES})
