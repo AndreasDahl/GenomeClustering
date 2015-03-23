@@ -136,6 +136,6 @@ float kMerDistanceLevenshtein(FastaContainer& kMer1, FastaContainer& kMer2)
     unsigned int result = column[s1len];
     delete column;
     return (float)(result - ((s1len - s2len > 0) ? s1len - s2len : s2len - s1len)) /
-        (float)((s1len < s1len) ? s1len : s1len);
+        (float)((s1len < s2len) ? s1len : s2len);
 }
 
