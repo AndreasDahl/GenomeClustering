@@ -15,6 +15,7 @@
 #include "MufDifference.h"
 #include "KMeans.h"
 #include "SimpleGreedyClustering.h"
+#include "FastaComparators.h"
 
 #include <iostream>
 #include <vector>
@@ -45,7 +46,9 @@ void simpleGreedyClusteringTest(char* file_path) {
 			strings.pop_back();
 			break;
 		}
+		createCountedKmer(strings.back(), 5);
 	}
+	std::sort(strings.begin(), strings.end(), Kmer::greater_than);
 
 	SimpleGreedySettings settings = SimpleGreedySettings(0.03f);
 	settings.greedyPick = true;

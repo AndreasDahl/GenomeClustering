@@ -14,6 +14,7 @@ set(SOURCE_FILES
     src/MufDifference.h
     src/MufDifference.cpp
     src/PrintUtils.h
-    src/PrintUtils.cpp)
+    src/PrintUtils.cpp
+    src/FastaComparators.h)
 
 add_executable(GenomeClustering ${SOURCE_FILES})
