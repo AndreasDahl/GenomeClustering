@@ -53,7 +53,7 @@ void simpleGreedyClusteringTest(char* file_path) {
 	SimpleGreedySettings settings = SimpleGreedySettings(0.03f);
 //	settings.greedyPick = true;
 //	settings.cacheSize = 64;
-	simpleGreedyClustering<FastaContainer>(strings, mufDifference, settings);
+	simpleGreedyClustering<FastaContainer>(strings, mufDifference, settings, std::cout);
 	timestamp_t t1 = get_timestamp();
 
 	std::cout << (t1 - t0) / 1000000.0L << std::endl;
