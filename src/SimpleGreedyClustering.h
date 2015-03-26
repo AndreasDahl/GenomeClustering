@@ -16,6 +16,7 @@
 
 struct SimpleGreedySettings {
     bool greedyPick = true;
+    bool lru = true;
     unsigned int cacheSize = 32;
     float similarity;
 
@@ -53,9 +54,11 @@ void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T  &, T  &), Sim
             centroids.push_front(&(*current));
             c_count++;
         } else {
-            // Move hit to front of cache
-            centroids.erase(it);
-            centroids.push_front(*it);
+            if (settings.lru) {
+                // Move hit to front of cache
+                centroids.erase(it);
+                centroids.push_front(*it);
+            }
         }
     }
     out << "\r" << "Cluster Count:" << c_count << std::endl;
