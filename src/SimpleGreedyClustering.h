@@ -28,12 +28,12 @@ struct SimpleGreedySettings {
 template <typename T>
 void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T  &, T  &), SimpleGreedySettings settings, std::ostream& out) {
     std::list<T*> centroids;
-    out << data.size() << std::endl;
+    std::cout << data.size() << std::endl;
     int c_count = 0;
     int n = 0;
     for (typename std::vector<T>::iterator current = data.begin(); current != data.end(); ++current) {
         // Output progress FIXME: Move somewhere else.
-        if (++n % 1000 == 0) {
+        if (++n % 100 == 0) {
             printProgress((float)(n) / data.size());
         }
         float bestDist = std::numeric_limits<float>::infinity();
@@ -61,7 +61,7 @@ void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T  &, T  &), Sim
             }
         }
     }
-    out << "\r" << "Cluster Count:" << c_count << std::endl;
+    std::cout << "\r" << "Cluster Count:" << c_count << std::endl;
 }
 
 #endif
