@@ -65,7 +65,6 @@ void distance_challenge(char* file_path) {
 	std::ofstream myfile;
 	myfile.open ("challenge.csv");
 	timestamp_t t0 = get_timestamp();
-	unsigned int i = 0;
 	for (std::vector<FastaContainer>::iterator it1 = strings.begin(); it1 != strings.end(); ++it1) {
 		for (std::vector<FastaContainer>::iterator it2 = strings.begin(); it2 != strings.end(); ++it2) {
 			myfile << mufDifference(*it1, *it2);
