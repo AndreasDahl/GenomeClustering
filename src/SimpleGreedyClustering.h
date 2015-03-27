@@ -27,6 +27,7 @@ struct SimpleGreedySettings {
 
 template <typename T>
 void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T  &, T  &), SimpleGreedySettings settings, std::ostream& out) {
+    std::vector<int> indexes; // Used for data analysis
     std::list<T*> centroids;
     std::cout << data.size() << std::endl;
     int c_count = 0;
@@ -38,9 +39,13 @@ void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T  &, T  &), Sim
         }
         float bestDist = std::numeric_limits<float>::infinity();
         typename std::list<T*>::iterator it;
+        unsigned int i = 0; // Used for data analysis
+        unsigned int index = 0; // Used for data analysis
         for (it = centroids.begin(); it != centroids.end(); ++it) {
+            ++i;
             float distance = dist(*current, **it);
             if (distance < settings.similarity && distance < bestDist) {
+                index = i;
                 bestDist = distance;
                 if (settings.greedyPick)
                     break;
@@ -53,12 +58,15 @@ void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T  &, T  &), Sim
             }
             centroids.push_front(&(*current));
             c_count++;
+            indexes.push_back(c_count); // TODO: Work for LRU ?
+            out << c_count << ' ' << 0 << std::endl;
         } else {
             if (settings.lru) {
                 // Move hit to front of cache
                 centroids.erase(it);
                 centroids.push_front(*it);
             }
+            out << indexes[c_count - index] << ' ' << index << std::endl;
         }
     }
     std::cout << "\r" << "Cluster Count:" << c_count << std::endl;

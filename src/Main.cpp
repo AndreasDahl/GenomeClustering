@@ -46,14 +46,11 @@ void simpleGreedyClusteringTest(char* file_path) {
 			strings.pop_back();
 			break;
 		}
-		createCountedKmer(strings.back(), 5);
 	}
-	std::sort(strings.begin(), strings.end(), Kmer::greater_than);
 
 	SimpleGreedySettings settings = SimpleGreedySettings(0.03f);
-//	settings.greedyPick = true;
-//	settings.cacheSize = 64;
-	simpleGreedyClustering<FastaContainer>(strings, mufDifference, settings, std::cout);
+	std::ostream nullstream = std::ostream(0);
+	simpleGreedyClustering<FastaContainer>(strings, mufDifference, settings, nullstream);
 	timestamp_t t1 = get_timestamp();
 
 	long double seconds = (t1 - t0) / 1000000.0L;
