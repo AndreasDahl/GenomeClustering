@@ -14,7 +14,7 @@
 #include "FastaIO.h"
 #include "MufDifference.h"
 #include "KMeans.h"
-#include "SimpleGreedyClustering.h"
+#include "GreedyClustering.h"
 #include "FastaComparators.h"
 
 #include <iostream>
@@ -48,9 +48,9 @@ void simpleGreedyClusteringTest(char* file_path) {
 		}
 	}
 
-	SimpleGreedySettings settings = SimpleGreedySettings(0.03f);
+	greedySettings settings = greedySettings(0.03f);
 	std::ostream nullstream = std::ostream(0);
-	simpleGreedyClustering<FastaContainer>(strings, mufDifference, settings, nullstream);
+	greedyClustering<FastaContainer>(strings, mufDifference, settings, nullstream);
 	timestamp_t t1 = get_timestamp();
 
 	long double seconds = (t1 - t0) / 1000000.0L;
