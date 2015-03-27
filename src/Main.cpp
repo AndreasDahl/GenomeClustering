@@ -68,12 +68,50 @@ void simpleGreedyClusteringTest(char* file_path) {
 	fastaIO.closeRead();
 }
 
+void distance_challenge(char* file_path) {
+	FastaIO fastaIO;
+	fastaIO.openRead(file_path);
+
+	vector<FastaContainer> strings;
+
+	for (unsigned int i = 0; i < 500; ++i) {
+		strings.push_back(FastaContainer());
+		if(fastaIO.getNextLine(strings.back())) {
+			strings.pop_back();
+			break;
+		}
+	}
+
+	std::ofstream myfile;
+	myfile.open ("challenge.csv");
+	timestamp_t t0 = get_timestamp();
+	unsigned int i = 0;
+	for (std::vector<FastaContainer>::iterator it1 = strings.begin(); it1 != strings.end(); ++it1) {
+		for (std::vector<FastaContainer>::iterator it2 = strings.begin(); it2 != strings.end(); ++it2) {
+			myfile << mufDifference(*it1, *it2);
+		}
+	}
+	timestamp_t t1 = get_timestamp();
+	myfile.close();
+
+	long double seconds = (t1 - t0) / 1000000.0L;
+	unsigned long minutes = (unsigned long)seconds / 60;
+	seconds -= minutes * 60;
+	std::cout << "Execution took ";
+	if (minutes > 0) {
+		std::cout << minutes << " minutes and ";
+	}
+	std::cout << seconds << " seconds to complete.";
+}
+
 int main(int argc, char** argv)
 {
 	if(argc < 2)
 		return -1;
 
 	simpleGreedyClusteringTest(argv[1]);
+
+//	distance_challenge(argv[1]);
 
 	return 0;
 }
