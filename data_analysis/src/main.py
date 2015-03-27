@@ -3,6 +3,8 @@ __author__ = 'Andreas Dahl'
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
+from collections import Counter
+
 
 def load_data(file_path, delimiter=' '):
     """
@@ -16,6 +18,16 @@ def load_data(file_path, delimiter=' '):
         for row in reader:
             data.append([int(value) for value in row])
         return np.array(data)
+
+
+def plot_hits(data, name='hits'):
+    n = 10
+    plt.figure()
+    plt.title(name)
+    plt.hist(data, 50, color='g')
+    common = Counter(data).most_common(n)
+    print name, "most common clusters:", common
+    print "%.2f%% of values hit the same %d cluster" % (float(sum([v for _, v in common])) / len(data) * 100, n)
 
 
 def plot_lookups(data, name='lookups'):
@@ -40,13 +52,8 @@ if __name__ == "__main__":
     gb = [x for x in greed[:,1] if x != 0]
     lb = [x for x in lru[:,1] if x != 0]
 
-    plt.figure()
-    plt.title("Best Hits")
-    plt.hist(nogreed[:,0], 50, color='g')
-
-    plt.figure()
-    plt.title("Greedy Hits")
-    plt.hist(greed[:,0], 50, color='g')
+    plot_hits(nogreed[:,0], "Best Hits")
+    plot_hits(greed[:,0], "Greedy Hits")
 
     plot_lookups(nb, "Full lookups")
     plot_lookups(gb, "Greedy lookups")
