@@ -16,7 +16,7 @@ def load_data(file_path, delimiter=' '):
         reader = csv.reader(f, delimiter=delimiter)
         data = []
         for row in reader:
-            data.append([int(value) for value in row])
+            data.append([value for value in row])
         return np.array(data)
 
 
@@ -53,7 +53,7 @@ def plot_lookups(data, name='lookups'):
     plt.plot([per95, per95], plt.ylim(), c='r')
 
 
-if __name__ == "__main__":
+def analyse_data():
     # load data
     full = load_data("res/length_muf_full.csv")
     lkmer = load_data("res/lkmer_muf_full.csv")
@@ -61,18 +61,39 @@ if __name__ == "__main__":
     greed = load_data("res/length_muf_greedy.csv")
     lru = load_data("res/length_muf_lru.csv")
 
-    # Remove new clusters from backtrack
-    nb = [x for x in full[:,1] if x != 0]
-    gb = [x for x in greed[:,1] if x != 0]
-    lb = [x for x in lru[:,1] if x != 0]
+    full.astype(int)
+    lkmer.astype(int)
+    kmer.astype(int)
+    greed.astype(int)
+    lru.astype(int)
 
-    plot_hits(full[:,0], "Best Hits")
-    plot_hits(kmer[:,0], "Kmer Hits")
-    plot_hits(lkmer[:,0], "Length-Kmer Hits")
-    plot_hits(greed[:,0], "Greedy Hits")
+    # Remove new clusters from backtrack
+    nb = [x for x in full[:, 1] if x != 0]
+    gb = [x for x in greed[:, 1] if x != 0]
+    lb = [x for x in lru[:, 1] if x != 0]
+
+    plot_hits(full[:, 0], "Best Hits")
+    plot_hits(kmer[:, 0], "Kmer Hits")
+    plot_hits(lkmer[:, 0], "Length-Kmer Hits")
+    plot_hits(greed[:, 0], "Greedy Hits")
 
     plot_lookups(nb, "Full lookups")
     plot_lookups(gb, "Greedy lookups")
     plot_lookups(lb, "LRU lookups")
+
+
+def analyse_comparisons():
+    data = load_data("res/compare.csv")
+    data.astype(float)
+    plt.axis([0, 1, 0, 1])
+    plt.xlabel("k-mers")
+    plt.ylabel("levenshtein")
+
+    plt.scatter(data[:, 0], data[:, 1], marker='x')
+    plt.plot(plt.xlim(), plt.ylim(), c='r')
+
+
+if __name__ == "__main__":
+    analyse_comparisons()
 
     plt.show()

@@ -66,6 +66,37 @@ void distance_challenge(char* file_path) {
 	std::cout << "Execution took " << formatDuration(t0, t1) << " to complete";
 }
 
+void compareLevenshteinKmer(char* file_path) {
+	FastaIO fastaIO;
+	fastaIO.openRead(file_path);
+
+	vector<FastaContainer> strings;
+
+	while (true) {
+		strings.push_back(FastaContainer());
+		if(fastaIO.getNextLine(strings.back())) {
+			strings.pop_back();
+			break;
+		}
+	}
+
+	std::cout << "size " << strings.size() << std::flush;
+	std::ofstream myfile;
+	myfile.open ("compare.csv");
+	for (unsigned int i = 0; i < strings.size() - 1; ++i) {
+		for (unsigned int j = i + 1; j < strings.size(); ++j) {
+			myfile << mufDifference(strings[i], strings[j]);
+			myfile << " ";
+			myfile << kMerDistanceLevenshtein(strings[i], strings[j]);
+			myfile << std::endl;
+		}
+		printProgress((float) i / strings.size());
+	}
+	std::cout.flush();
+	myfile.close();
+
+}
+
 int main(int argc, char** argv)
 {
 	if(argc < 2)
@@ -74,6 +105,8 @@ int main(int argc, char** argv)
 	simpleGreedyClusteringTest(argv[1]);
 
 //	distance_challenge(argv[1]);
+
+//	compareLevenshteinKmer(argv[1]);
 
 	return 0;
 }
