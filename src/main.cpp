@@ -56,7 +56,14 @@ void simpleGreedyClusteringTest(char* file_path) {
 	simpleGreedyClustering<FastaContainer>(strings, mufDifference, settings, std::cout);
 	timestamp_t t1 = get_timestamp();
 
-	std::cout << "Execution took " << (t1 - t0) / 1000000.0L << " seconds to complete" << std::endl;
+	long double seconds = (t1 - t0) / 1000000.0L;
+	unsigned long minutes = (unsigned long)seconds / 60;
+	seconds -= minutes * 60;
+	std::cout << "Execution took ";
+	if (minutes > 0) {
+		std::cout << minutes << " minutes and ";
+	}
+	std::cout << seconds << " seconds to complete.";
 
 	fastaIO.closeRead();
 }
