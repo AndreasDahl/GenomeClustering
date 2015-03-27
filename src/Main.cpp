@@ -9,7 +9,6 @@
 #include <string>
 
 #include <math.h>
-#include <sys/time.h>
 
 #include "FastaIO.h"
 #include "MufDifference.h"
@@ -23,15 +22,6 @@
 using std::vector;
 
 using std::list;
-
-typedef unsigned long long timestamp_t;
-
-static timestamp_t get_timestamp()
-{
-	struct timeval now;
-	gettimeofday (&now, NULL);
-	return  now.tv_usec + (timestamp_t)now.tv_sec * 1000000;
-}
 
 void simpleGreedyClusteringTest(char* file_path) {
 	FastaIO fastaIO;
@@ -53,14 +43,7 @@ void simpleGreedyClusteringTest(char* file_path) {
 	greedyClustering<FastaContainer>(strings, mufDifference, settings, nullstream);
 	timestamp_t t1 = get_timestamp();
 
-	long double seconds = (t1 - t0) / 1000000.0L;
-	unsigned long minutes = (unsigned long)seconds / 60;
-	seconds -= minutes * 60;
-	std::cout << "Execution took ";
-	if (minutes > 0) {
-		std::cout << minutes << " minutes and ";
-	}
-	std::cout << seconds << " seconds to complete.";
+	std::cout << "Execution took " << formatDuration(t0, t1) << " to complete." << std::endl;
 
 	fastaIO.closeRead();
 }
@@ -91,14 +74,7 @@ void distance_challenge(char* file_path) {
 	timestamp_t t1 = get_timestamp();
 	myfile.close();
 
-	long double seconds = (t1 - t0) / 1000000.0L;
-	unsigned long minutes = (unsigned long)seconds / 60;
-	seconds -= minutes * 60;
-	std::cout << "Execution took ";
-	if (minutes > 0) {
-		std::cout << minutes << " minutes and ";
-	}
-	std::cout << seconds << " seconds to complete.";
+	std::cout << "Execution took " << formatDuration(t0, t1) << " to complete";
 }
 
 int main(int argc, char** argv)
