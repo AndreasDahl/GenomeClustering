@@ -26,15 +26,20 @@ struct SimpleGreedySettings {
 };
 
 template <typename T>
-void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T  &, T  &), SimpleGreedySettings settings, std::ostream& out) {
+//void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T  &, T  &), SimpleGreedySettings settings, std::ostream&) {
+void simpleGreedyClustering(FastaIO& dataIO, float (*dist)(T  &, T  &), SimpleGreedySettings settings, std::ostream&) {
     std::list<T*> centroids;
-    std::cout << data.size() << std::endl;
     int c_count = 0;
     int n = 0;
-    for (typename std::vector<T>::iterator current = data.begin(); current != data.end(); ++current) {
+    while(++n) {
+        FastaContainer* current = new FastaContainer();
+        if(dataIO.getNextLine(*current)) {
+            delete current;
+            break;
+        }
         // Output progress FIXME: Move somewhere else.
         if (++n % 100 == 0) {
-            printProgress((float)(n) / data.size());
+            printProgress((float)(dataIO.getReadFileRead()) / dataIO.getReadFileLength());
         }
         float bestDist = std::numeric_limits<float>::infinity();
         typename std::list<T*>::iterator it;
@@ -49,18 +54,22 @@ void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T  &, T  &), Sim
         if (bestDist > settings.similarity) {
             // Only keep "N" centroids.
             if (centroids.size() >= settings.cacheSize) {
+                FastaContainer* temp = centroids.back();
                 centroids.pop_back();
+                delete temp;
             }
-            centroids.push_front(&(*current));
+            centroids.push_front(current);
             c_count++;
         } else {
             if (settings.lru) {
                 // Move hit to front of cache
+                FastaContainer* temp = *it;
                 centroids.erase(it);
-                centroids.push_front(*it);
+                centroids.push_front(temp);
             }
         }
     }
+    std::cout << std::endl << "\r" << "Seq Count:" << n << std::endl;
     std::cout << "\r" << "Cluster Count:" << c_count << std::endl;
 }
 

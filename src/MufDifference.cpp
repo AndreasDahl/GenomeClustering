@@ -33,16 +33,12 @@ int createCountedKmer(FastaContainer& str, unsigned int k)
     unsigned int permutations = 1 << (k << 1); // 4^k == 2^(k*2)
 
     // Delete the counted kMer if it exists.
-    if(str.kMer != NULL) {
-        delete str.kMer;
-    }
-
-    str.kMer = new int[permutations];
+    str.setKMerLength(permutations);
     str.k = k;
 
     // Set all elements an the counted kMer to 0.
     for(unsigned int i = 0; i < permutations; i++) {
-        str.kMer[i] = 0;
+        str.getKMer()[i] = 0;
     }
 
     // If the size of the sequence is less than k, no kMer can exist.
@@ -57,7 +53,7 @@ int createCountedKmer(FastaContainer& str, unsigned int k)
             kMer <<= 2;
             kMer |= (str.sequence[i+j] & 6) >> 1;
         }
-        str.kMer[kMer] += 1;
+        str.getKMer()[kMer] += 1;
     }
 
     // Everything went well, return 0.
@@ -75,16 +71,16 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2)
     int sequenceSizeDifference = std::abs(strSize1 - strSize2);
     int difference = -sequenceSizeDifference;
 
-    if(str1.kMer == NULL || str1.k != k) {
+    if(str1.getKMer() == NULL || str1.k != k) {
         createCountedKmer(str1, k);
     }
 
-    if(str2.kMer == NULL || str2.k != k) {
+    if(str2.getKMer() == NULL || str2.k != k) {
         createCountedKmer(str2, k);
     }
 
     for(unsigned int i = 0; i < permutations; i++) {
-        difference += std::abs(str1.kMer[i] - str2.kMer[i]);
+        difference += std::abs(str1.getKMer()[i] - str2.getKMer()[i]);
     }
 
     // Find the real constant instead of 6.0

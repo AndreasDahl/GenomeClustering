@@ -16,7 +16,7 @@ struct LengthThenKmer
             return true;
         } else if (fa1.sequence.size() == fa2.sequence.size()) {
             for (unsigned int i = 0; i < permutations; ++i) {
-                if (fa1.kMer[i] < fa2.kMer[i]) {
+                if (fa1.getKMer()[i] < fa2.getKMer()[i]) {
                     return true;
                 }
             }
@@ -35,7 +35,7 @@ struct Kmer
     {
         unsigned int permutations = 1 << (fa1.k << 1); // 4^k == 2^(k*2)
         for (unsigned int i = 0; i < permutations; ++i) {
-            if (fa1.kMer[i] < fa2.kMer[i]) {
+            if (fa1.getKMer()[i] < fa2.getKMer()[i]) {
                 return true;
             }
         }

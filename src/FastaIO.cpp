@@ -8,7 +8,9 @@
 FastaIO::FastaIO() :
 	m_readStream(NULL),
 	m_writeStream(NULL),
-	m_nextLineNumber(0)
+	m_nextLineNumber(0),
+	m_readFileLength(0),
+	m_bytesRead(0)
 {}
 
 FastaIO::~FastaIO()
@@ -53,6 +55,12 @@ int FastaIO::openRead(const char* filename)
 		return -1;
 	}
 
+	m_readStream->seekg(0, m_readStream->end);
+	m_readFileLength = (long)m_readStream->tellg();
+	m_readStream->seekg(0, m_readStream->beg);
+
+	m_bytesRead = 0;
+
 	return 0;
 }
 
@@ -79,6 +87,11 @@ bool FastaIO::writeIsOpen() const
 	return m_writeStream != NULL;
 }
 
+void FastaIO::writeAsync()
+{
+
+}
+
 int FastaIO::getNextLine(FastaContainer& out)
 {
 	std::string str;
@@ -88,6 +101,7 @@ int FastaIO::getNextLine(FastaContainer& out)
 
 	while(std::getline(*m_readStream, str))
 	{
+		m_bytesRead += (long)str.size();
 		if(str[0] != '>') {
 			out.sequence += str;
 			if(out.lineNumber == 0) {
@@ -101,4 +115,14 @@ int FastaIO::getNextLine(FastaContainer& out)
 	}
 
 	return -1;
+}
+
+long FastaIO::getReadFileLength() const
+{
+	return m_readFileLength;
+}
+
+long FastaIO::getReadFileRead() const
+{
+	return m_bytesRead;
 }

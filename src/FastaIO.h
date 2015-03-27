@@ -9,18 +9,69 @@
 #include <fstream>
 #include <string>
 
-struct FastaContainer
+class FastaContainer
 {
-	std::string sequence;
-	unsigned long lineNumber;
-	int* kMer;
-	unsigned int k; // Size of k
-	FastaContainer() {
-		sequence = "";
-		lineNumber = 0;
-		kMer = NULL;
-		k = -1;
-	}
+	public:
+		FastaContainer() :
+			sequence(""),
+			lineNumber(0),
+			kMerLength(0),
+			k(-1),
+			m_kMer(NULL)
+		{}
+
+		FastaContainer(const FastaContainer& other) :
+			sequence(other.sequence),
+			lineNumber(other.lineNumber),
+			kMerLength(other.kMerLength),
+			k(other.k),
+			m_kMer(NULL)
+		{
+			if(kMerLength > 0) {
+				m_kMer = new int[kMerLength];
+				for(unsigned int i = 0; i < kMerLength; i++)
+					m_kMer[i] = other.m_kMer[i];
+			}
+		}
+
+		~FastaContainer() {
+			if(m_kMer) delete m_kMer;
+		}
+
+		FastaContainer& operator=(const FastaContainer& other) {
+			if(&other != this) {
+				sequence = other.sequence;
+				lineNumber = other.lineNumber;
+				kMerLength = other.kMerLength;
+				k = other.k;
+				if(m_kMer) delete m_kMer;
+				m_kMer = (kMerLength > 0) ? new int[kMerLength] : NULL;
+			}
+			return *this;
+		}
+
+		void setKMerLength(unsigned int KMerLength) {
+			kMerLength = KMerLength;
+			if(m_kMer) delete m_kMer;
+			m_kMer = (kMerLength > 0) ? new int[kMerLength] : NULL;
+		}
+
+		int* getKMer() {
+			return m_kMer;
+		}
+
+		const int* getKMer() const {
+			return m_kMer;
+		}
+
+		std::string sequence;
+		unsigned long lineNumber;
+
+		unsigned int kMerLength;
+		unsigned int k; // Size of k
+
+	private:
+		int* m_kMer;
 };
 
 class FastaIO
@@ -45,11 +96,17 @@ class FastaIO
 
 		int getNextLine(FastaContainer& out);
 
+		long getReadFileLength() const;
+		long getReadFileRead() const;
+
 	private:
 		std::ifstream* m_readStream;
 		std::ofstream* m_writeStream;
 
 		unsigned int m_nextLineNumber;
+
+		long m_readFileLength;
+		long m_bytesRead;
 };
 
 #endif

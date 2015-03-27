@@ -37,23 +37,23 @@ void simpleGreedyClusteringTest(char* file_path) {
 	FastaIO fastaIO;
 	fastaIO.openRead(file_path);
 
-	vector<FastaContainer> strings;
+	//vector<FastaContainer> strings;
 
 	timestamp_t t0 = get_timestamp();
-	while (true) {
+	/*while (true) {
 		strings.push_back(FastaContainer());
 		if(fastaIO.getNextLine(strings.back())) {
 			strings.pop_back();
 			break;
 		}
-		createCountedKmer(strings.back(), 5);
-	}
-	std::sort(strings.begin(), strings.end(), Kmer::greater_than);
+		//createCountedKmer(strings.back(), 5);
+	}*/
+	//std::sort(strings.begin(), strings.end(), Kmer::greater_than);
 
 	SimpleGreedySettings settings = SimpleGreedySettings(0.03f);
 //	settings.greedyPick = true;
 //	settings.cacheSize = 64;
-	simpleGreedyClustering<FastaContainer>(strings, mufDifference, settings, std::cout);
+	simpleGreedyClustering<FastaContainer>(fastaIO, mufDifference, settings, std::cout);
 	timestamp_t t1 = get_timestamp();
 
 	long double seconds = (t1 - t0) / 1000000.0L;
@@ -63,7 +63,7 @@ void simpleGreedyClusteringTest(char* file_path) {
 	if (minutes > 0) {
 		std::cout << minutes << " minutes and ";
 	}
-	std::cout << seconds << " seconds to complete.";
+	std::cout << seconds << " seconds to complete." << std::endl;
 
 	fastaIO.closeRead();
 }
