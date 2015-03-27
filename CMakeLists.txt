@@ -10,7 +10,7 @@ set(SOURCE_FILES
     src/KMeans.cpp
     src/KMeans.h
     src/Main.cpp
-    src/SimpleGreedyClustering.h
+    src/GreedyClustering.h
     src/MufDifference.h
     src/MufDifference.cpp
     src/PrintUtils.h

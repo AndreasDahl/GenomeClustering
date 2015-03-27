@@ -14,24 +14,24 @@
 #include <list>
 #include "PrintUtils.h"
 
-struct SimpleGreedySettings {
+struct greedySettings {
     bool greedyPick = true;
     bool lru = true;
     unsigned int cacheSize = 32;
     float similarity;
 
-    SimpleGreedySettings(float similarity) {
+    greedySettings(float similarity) {
         this->similarity = similarity;
     }
 };
 
 template <typename T>
-//void simpleGreedyClustering(std::vector<T>& data, float (*dist)(T  &, T  &), SimpleGreedySettings settings, std::ostream&) {
-void simpleGreedyClustering(FastaIO& dataIO, float (*dist)(T  &, T  &), SimpleGreedySettings settings, std::ostream&) {
+void greedyClustering(FastaIO& dataIO, float (*dist)(T  &, T  &), greedySettings settings, std::ostream* out) {
+    std::vector<int> indexes; // Used for data analysis
     std::list<T*> centroids;
     int c_count = 0;
     int n = 0;
-    while(++n) {
+    while(true) {
         FastaContainer* current = new FastaContainer();
         if(dataIO.getNextLine(*current)) {
             delete current;
@@ -43,9 +43,13 @@ void simpleGreedyClustering(FastaIO& dataIO, float (*dist)(T  &, T  &), SimpleGr
         }
         float bestDist = std::numeric_limits<float>::infinity();
         typename std::list<T*>::iterator it;
+        unsigned int i = 0; // Used for data analysis
+        unsigned int index = 0; // Used for data analysis
         for (it = centroids.begin(); it != centroids.end(); ++it) {
+            ++i;
             float distance = dist(*current, **it);
             if (distance < settings.similarity && distance < bestDist) {
+                index = i;
                 bestDist = distance;
                 if (settings.greedyPick)
                     break;
@@ -60,6 +64,8 @@ void simpleGreedyClustering(FastaIO& dataIO, float (*dist)(T  &, T  &), SimpleGr
             }
             centroids.push_front(current);
             c_count++;
+            indexes.push_back(c_count); // TODO: Work for LRU ?
+            if(out) *out << c_count << ' ' << 0 << std::endl;
         } else {
             if (settings.lru) {
                 // Move hit to front of cache
@@ -67,6 +73,7 @@ void simpleGreedyClustering(FastaIO& dataIO, float (*dist)(T  &, T  &), SimpleGr
                 centroids.erase(it);
                 centroids.push_front(temp);
             }
+            if(out) *out << indexes[c_count - index] << ' ' << index << std::endl;
         }
     }
     std::cout << std::endl << "\r" << "Seq Count:" << n << std::endl;
