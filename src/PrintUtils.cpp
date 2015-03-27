@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <limits>
 #include "PrintUtils.h"
 
 timestamp_t get_timestamp()
@@ -17,6 +18,8 @@ timestamp_t get_timestamp()
 }
 
 void printProgress(float progress) {
+    if (progress > 1.0f)
+        progress = 0.0f;
     unsigned int barLength = 50;
     unsigned long barsChars = (unsigned long)(progress * barLength);
     std::string bars(barsChars, '=');
