@@ -5,32 +5,29 @@
 */
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <string>
-
-#include <math.h>
 
 #include "FastaIO.h"
 #include "MufDifference.h"
 #include "KMeans.h"
 #include "GreedyClustering.h"
-#include "FastaComparators.h"
+#include "PrintUtils.h"
 
 #include <iostream>
-#include <vector>
+#include <list>
 
 using std::vector;
 
 using std::list;
 
-void simpleGreedyClusteringTest(char* file_path) {
+void greedyClusteringTest(char* file_path) {
 	FastaIO fastaIO;
 	fastaIO.openRead(file_path);
 
 	timestamp_t t0 = get_timestamp();
 
 	GreedySettings settings = GreedySettings(0.03f);
-	greedyClustering<FastaContainer>(fastaIO, mufDifference, settings, NULL);
+	greedyClustering(fastaIO, mufDifference, settings, NULL);
 	timestamp_t t1 = get_timestamp();
 
 	std::cout << "Execution took " << formatDuration(t0, t1) << " to complete." << std::endl;
@@ -102,7 +99,7 @@ int main(int argc, char** argv)
 	if(argc < 2)
 		return -1;
 
-	simpleGreedyClusteringTest(argv[1]);
+	greedyClusteringTest(argv[1]);
 
 //	distance_challenge(argv[1]);
 

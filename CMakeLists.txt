@@ -11,6 +11,7 @@ set(SOURCE_FILES
     src/KMeans.h
     src/Main.cpp
     src/GreedyClustering.h
+    src/GreedyClustering.cpp
     src/MufDifference.h
     src/MufDifference.cpp
     src/PrintUtils.h
