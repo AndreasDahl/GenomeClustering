@@ -43,16 +43,16 @@ def plot_lookups(data, name='lookups'):
 
 if __name__ == "__main__":
     # load data
-    greed = load_data("res/muf_greed.csv")
-    nogreed = load_data("res/muf_nogreed.csv")
-    lru = load_data("res/muf_lru.csv")
+    full = load_data("res/length_muf_full.csv")
+    greed = load_data("res/length_muf_greedy.csv")
+    lru = load_data("res/length_muf_lru.csv")
 
     # Remove new clusters from backtrack
-    nb = [x for x in nogreed[:,1] if x != 0]
+    nb = [x for x in full[:,1] if x != 0]
     gb = [x for x in greed[:,1] if x != 0]
     lb = [x for x in lru[:,1] if x != 0]
 
-    plot_hits(nogreed[:,0], "Best Hits")
+    plot_hits(full[:,0], "Best Hits")
     plot_hits(greed[:,0], "Greedy Hits")
 
     plot_lookups(nb, "Full lookups")
