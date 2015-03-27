@@ -14,19 +14,19 @@
 #include <list>
 #include "PrintUtils.h"
 
-struct greedySettings {
+struct GreedySettings {
     bool greedyPick = true;
     bool lru = true;
     unsigned int cacheSize = 32;
     float similarity;
 
-    greedySettings(float similarity) {
+    GreedySettings(float similarity) {
         this->similarity = similarity;
     }
 };
 
 template <typename T>
-void greedyClustering(FastaIO& dataIO, float (*dist)(T  &, T  &), greedySettings settings, std::ostream* out) {
+void greedyClustering(FastaIO& dataIO, float (*dist)(T  &, T  &), GreedySettings settings, std::ostream* out) {
     std::vector<int> indexes; // Used for data analysis
     std::list<T*> centroids;
     int c_count = 0;

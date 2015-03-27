@@ -29,7 +29,7 @@ void simpleGreedyClusteringTest(char* file_path) {
 
 	timestamp_t t0 = get_timestamp();
 
-	greedySettings settings = greedySettings(0.03f);
+	GreedySettings settings = GreedySettings(0.03f);
 	greedyClustering<FastaContainer>(fastaIO, mufDifference, settings, NULL);
 	timestamp_t t1 = get_timestamp();
 
