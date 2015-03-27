@@ -49,7 +49,7 @@ void simpleGreedyClusteringTest(char* file_path) {
 	}
 
 	greedySettings settings = greedySettings(0.03f);
-	std::ostream nullstream = std::ostream(0);
+	std::ofstream nullstream = std::ofstream(0);
 	greedyClustering<FastaContainer>(strings, mufDifference, settings, nullstream);
 	timestamp_t t1 = get_timestamp();
 
