@@ -24,7 +24,7 @@ class GreedyClustering {
     public:
         GreedyClustering(float similarity);
 
-        void greedyClustering(FastaIO& dataIO, float (*dist)(FastaContainer &, FastaContainer &), std::ostream* out);
+        void start(FastaIO &dataIO, float (*dist)(FastaContainer &, FastaContainer &), std::ostream *out);
 
     private:
         bool m_greedyPick = true;

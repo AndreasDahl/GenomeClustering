@@ -26,7 +26,7 @@ void greedyClusteringTest(char* file_path) {
 
 	timestamp_t t0 = get_timestamp();
 
-	GreedyClustering(0.03f).greedyClustering(fastaIO, mufDifference, NULL);
+	GreedyClustering(0.03f).start(fastaIO, mufDifference, NULL);
 	timestamp_t t1 = get_timestamp();
 
 	std::cout << "Execution took " << formatDuration(t0, t1) << " to complete." << std::endl;

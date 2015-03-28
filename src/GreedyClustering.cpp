@@ -19,7 +19,7 @@ GreedyClustering::GreedyClustering(float similarity) :
     m_similarity = similarity;
 }
 
-void GreedyClustering::greedyClustering(FastaIO& dataIO, float (*dist)(FastaContainer &, FastaContainer &), std::ostream* out) {
+void GreedyClustering::start(FastaIO &dataIO, float (*dist)(FastaContainer &, FastaContainer &), std::ostream *out) {
     std::vector<int> indexes; // Used for data analysis
     int c_count = 0;
     int n = 0;
