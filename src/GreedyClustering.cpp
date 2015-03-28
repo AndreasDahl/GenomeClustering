@@ -66,49 +66,24 @@ void GreedyClustering::greedyClustering(FastaIO& dataIO, float (*dist)(FastaCont
 
         // Current didn't match anything and is a new cluster
         if (!isHit(bestDist)) {
-            // Only keep "N" centroids.
-            if (m_cache.size() >= m_cacheSize) {
-                Centroid* temp = m_cache.back();
-                m_cache.pop_back();
-
-                bool inserted = insertIntoLongTerm(temp);
-                if (!inserted) {
-                    delete temp->fasta;
-                    delete temp;
-                }
-            }
-            Centroid* centroid = new Centroid(current);
-            m_cache.push_front(centroid);
+            Centroid *centroid = new Centroid(**it);
+            pushToCache(centroid);
 
             // Data collection
             c_count++;
             indexes.push_back(c_count); // TODO: Work for LRU ?
             if(out) *out << c_count << ' ' << 0 << std::endl;
         } else { // Current hit a cluster
+            Centroid *hit = *it;
+            hit->count = hit->count + 1;
             if (m_lru) {
-                Centroid *hit = *it;
-                hit->count = hit->count + 1;
                 // If hit in 'Clusters'
                 if (!hitBig) {
-                    // Move hit to front of cache
                     m_cache.erase(it);
-                    m_cache.push_front(hit);
                 } else {
                     m_longTermCache.erase(it);
-                    m_cache.push_front(hit);
-
-                    if (m_cache.size() > m_cacheSize) {
-                        Centroid* temp = m_cache.back();
-                        m_cache.pop_back();
-
-                        bool inserted = insertIntoLongTerm(temp);
-
-                        if (!inserted) {
-                            delete temp->fasta;
-                            delete temp;
-                        }
-                    }
                 }
+                pushToCache(hit);
             }
             // Data collection
             if(out) *out << indexes[c_count - index] << ' ' << index << std::endl;
@@ -124,7 +99,23 @@ bool GreedyClustering::isHit(float distance) {
     return distance < m_similarity;
 }
 
-bool GreedyClustering::insertIntoLongTerm(Centroid *centroid) {
+void GreedyClustering::pushToCache(Centroid *centroid) {
+    m_cache.push_front(centroid);
+
+    // Only keep "m_cacheSize" centroids.
+    if (m_cache.size() > m_cacheSize) {
+        Centroid* temp = m_cache.back();
+        m_cache.pop_back();
+
+        bool inserted = tryInsertIntoLongTerm(temp);
+        if (!inserted) {
+            delete temp->fasta;
+            delete temp;
+        }
+    }
+}
+
+bool GreedyClustering::tryInsertIntoLongTerm(Centroid *centroid) {
     // See if fits in bigCache
     bool inserted = false;
     for (std::list<Centroid*>::iterator it = m_longTermCache.begin(); it != m_longTermCache.end(); ++it) {
