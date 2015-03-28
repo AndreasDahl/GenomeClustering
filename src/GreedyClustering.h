@@ -14,6 +14,7 @@ struct GreedySettings {
     bool greedyPick = true;
     bool lru = true;
     unsigned int cacheSize = 32;
+    unsigned int bigCentCache = 32;
     float similarity;
 
     GreedySettings(float similarity) {
