@@ -31,7 +31,7 @@ void GreedyClustering::start(FastaIO &dataIO, float (*dist)(FastaContainer &, Fa
         }
         // Output progress FIXME: Move somewhere else.
         if (++n % 100 == 0) {
-            printProgress((float)(dataIO.getReadFileRead()) / dataIO.getReadFileLength());
+            printProgress(dataIO.getReadFileRead(), dataIO.getReadFileLength());
         }
         bool hitBig = false;
         float bestDist = std::numeric_limits<float>::infinity();

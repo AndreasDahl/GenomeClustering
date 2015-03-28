@@ -117,12 +117,12 @@ int FastaIO::getNextLine(FastaContainer& out)
 	return -1;
 }
 
-long FastaIO::getReadFileLength() const
+unsigned long FastaIO::getReadFileLength() const
 {
 	return m_readFileLength;
 }
 
-long FastaIO::getReadFileRead() const
+unsigned long FastaIO::getReadFileRead() const
 {
 	return m_bytesRead;
 }

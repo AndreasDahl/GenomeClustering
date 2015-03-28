@@ -8,6 +8,7 @@
 #include <sstream>
 #include <iomanip>
 #include <limits>
+#include <sys/time.h>
 #include "PrintUtils.h"
 
 timestamp_t get_timestamp()
@@ -17,9 +18,13 @@ timestamp_t get_timestamp()
     return  now.tv_usec + (timestamp_t)now.tv_sec * 1000000;
 }
 
-void printProgress(float progress) {
-    if (progress > 1.0f)
-        progress = 0.0f;
+void printProgress(unsigned long current, unsigned long max) {
+    float progress;
+    if (current >= max || max == 0) {
+        progress = 1.0f;
+    } else {
+        progress = (float) current / max;
+    }
     unsigned int barLength = 50;
     unsigned long barsChars = (unsigned long)(progress * barLength);
     std::string bars(barsChars, '=');

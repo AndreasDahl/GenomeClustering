@@ -96,8 +96,8 @@ class FastaIO
 
 		int getNextLine(FastaContainer& out);
 
-		long getReadFileLength() const;
-		long getReadFileRead() const;
+		unsigned long getReadFileLength() const;
+		unsigned long getReadFileRead() const;
 
 	private:
 		std::ifstream* m_readStream;
@@ -105,8 +105,8 @@ class FastaIO
 
 		unsigned int m_nextLineNumber;
 
-		long m_readFileLength;
-		long m_bytesRead;
+		unsigned long m_readFileLength;
+		unsigned long m_bytesRead;
 };
 
 #endif

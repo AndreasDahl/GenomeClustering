@@ -86,7 +86,7 @@ void compareLevenshteinKmer(char* file_path) {
 			myfile << kMerDistanceLevenshtein(strings[i], strings[j]);
 			myfile << std::endl;
 		}
-		printProgress((float) i / strings.size());
+		printProgress(i, strings.size());
 	}
 	std::cout.flush();
 	myfile.close();
