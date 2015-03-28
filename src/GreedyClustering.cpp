@@ -7,50 +7,47 @@
 
 #include <vector>
 #include <iostream>
-#include <list>
 #include "PrintUtils.h"
 
-struct Centroid {
-    FastaContainer* fasta;
-    unsigned int count = 1;
 
-    Centroid(FastaContainer* fasta) {
-        this->fasta=fasta;
-    }
-};
-
-
-static bool hasHit(float bestDist, float requirement) {
-    return bestDist < requirement;
+GreedyClustering::GreedyClustering(float similarity) :
+    m_greedyPick(true),
+    m_lru(true),
+    m_cacheSize(32),
+    m_bigCentCache(32)
+{
+    m_similarity = similarity;
 }
 
-static bool insertIfBig(std::list<Centroid *> &bigCents, Centroid* centroid, unsigned int capacity) {
+bool GreedyClustering::hasHit(float bestDist) {
+    return bestDist < m_similarity;
+}
+
+bool GreedyClustering::insertIfBig(Centroid* centroid) {
     // See if fits in bigCache
     bool inserted = false;
-    for (std::list<Centroid*>::iterator it = bigCents.begin(); it != bigCents.end(); ++it) {
+    for (std::list<Centroid*>::iterator it = m_bigCents.begin(); it != m_bigCents.end(); ++it) {
         if (centroid->count >= (*it)->count) {
-            bigCents.insert(it, centroid);
+            m_bigCents.insert(it, centroid);
             inserted = true;
-            if (bigCents.size() > capacity) {
-                Centroid* temp = bigCents.back();
-                bigCents.pop_back();
+            if (m_bigCents.size() > m_bigCentCache) {
+                Centroid* temp = m_bigCents.back();
+                m_bigCents.pop_back();
                 delete temp->fasta;
                 delete temp;
             }
             break;
         }
     }
-    if (!inserted && bigCents.size() < capacity) {
-        bigCents.push_back(centroid);
+    if (!inserted && m_bigCents.size() < m_bigCentCache) {
+        m_bigCents.push_back(centroid);
         inserted = true;
     }
     return inserted;
 }
 
-void greedyClustering(FastaIO& dataIO, float (*dist)(FastaContainer &, FastaContainer &), GreedySettings settings, std::ostream* out) {
+void GreedyClustering::greedyClustering(FastaIO& dataIO, float (*dist)(FastaContainer &, FastaContainer &), std::ostream* out) {
     std::vector<int> indexes; // Used for data analysis
-    std::list<Centroid *> bigCents;
-    std::list<Centroid *> centroids;
     int c_count = 0;
     int n = 0;
     while(true) {
@@ -69,69 +66,69 @@ void greedyClustering(FastaIO& dataIO, float (*dist)(FastaContainer &, FastaCont
         unsigned int i = 0; // Used for data analysis
         unsigned int index = 0; // Used for data analysis
         // Search through 'Centroids' list
-        for (it = centroids.begin(); it != centroids.end(); ++it) {
+        for (it = m_cache.begin(); it != m_cache.end(); ++it) {
             ++i;
             float distance = dist(*current, *(*it)->fasta);
-            if (hasHit(distance, settings.similarity) && distance < bestDist) {
+            if (hasHit(distance) && distance < bestDist) {
                 index = i;
                 bestDist = distance;
-                if (settings.greedyPick)
+                if (m_greedyPick)
                     break;
             }
         }
         // Did not hit in 'Centroids'. Search though bigCents. (Of if running thorough search)
-        if (!hasHit(bestDist, settings.similarity) || !settings.greedyPick) {
-            for (it = bigCents.begin(); it != bigCents.end(); ++it) {
+        if (!hasHit(bestDist) || !m_greedyPick) {
+            for (it = m_bigCents.begin(); it != m_bigCents.end(); ++it) {
                 ++i;
                 float distance = dist(*current, *(*it)->fasta);
-                if (hasHit(distance, settings.similarity) && distance < bestDist) {
+                if (hasHit(distance) && distance < bestDist) {
                     index = i;
                     bestDist = distance;
                     hitBig = true;
-                    if (settings.greedyPick)
+                    if (m_greedyPick)
                         break;
                 }
             }
         }
 
         // Current didn't match anything and is a new cluster
-        if (!hasHit(bestDist, settings.similarity)) {
+        if (!hasHit(bestDist)) {
             // Only keep "N" centroids.
-            if (centroids.size() >= settings.cacheSize) {
-                Centroid* temp = centroids.back();
-                centroids.pop_back();
+            if (m_cache.size() >= m_cacheSize) {
+                Centroid* temp = m_cache.back();
+                m_cache.pop_back();
 
-                bool inserted = insertIfBig(bigCents, temp, settings.bigCentCache);
+                bool inserted = insertIfBig(temp);
                 if (!inserted) {
                     delete temp->fasta;
                     delete temp;
                 }
             }
             Centroid* centroid = new Centroid(current);
-            centroids.push_front(centroid);
+            m_cache.push_front(centroid);
 
             // Data collection
             c_count++;
             indexes.push_back(c_count); // TODO: Work for LRU ?
             if(out) *out << c_count << ' ' << 0 << std::endl;
         } else { // Current hit a cluster
-            if (settings.lru) {
+            if (m_lru) {
                 Centroid *hit = *it;
                 hit->count = hit->count + 1;
                 // If hit in 'Clusters'
                 if (!hitBig) {
                     // Move hit to front of cache
-                    centroids.erase(it);
-                    centroids.push_front(hit);
+                    m_cache.erase(it);
+                    m_cache.push_front(hit);
                 } else {
-                    bigCents.erase(it);
-                    centroids.push_front(hit);
+                    m_bigCents.erase(it);
+                    m_cache.push_front(hit);
 
-                    if (centroids.size() > settings.cacheSize) {
-                        Centroid* temp = centroids.back();
-                        centroids.pop_back();
+                    if (m_cache.size() > m_cacheSize) {
+                        Centroid* temp = m_cache.back();
+                        m_cache.pop_back();
 
-                        bool inserted = insertIfBig(bigCents, temp, settings.bigCentCache);
+                        bool inserted = insertIfBig(temp);
 
                         if (!inserted) {
                             delete temp->fasta;

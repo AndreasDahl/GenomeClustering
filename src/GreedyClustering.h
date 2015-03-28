@@ -8,20 +8,36 @@
 #define GREEDY_H
 
 #include <stdio.h>
+#include <list>
 #include "FastaIO.h"
 
-struct GreedySettings {
-    bool greedyPick = true;
-    bool lru = true;
-    unsigned int cacheSize = 32;
-    unsigned int bigCentCache = 32;
-    float similarity;
+struct Centroid {
+    FastaContainer* fasta;
+    unsigned int count = 1;
 
-    GreedySettings(float similarity) {
-        this->similarity = similarity;
+    Centroid(FastaContainer* fasta) {
+        this->fasta=fasta;
     }
 };
 
-void greedyClustering(FastaIO& dataIO, float (*dist)(FastaContainer &, FastaContainer &), GreedySettings settings, std::ostream* out);
+class GreedyClustering {
+    public:
+        GreedyClustering(float similarity);
+
+        void greedyClustering(FastaIO& dataIO, float (*dist)(FastaContainer &, FastaContainer &), std::ostream* out);
+
+    private:
+        bool m_greedyPick = true;
+        bool m_lru = true;
+        unsigned int m_cacheSize = 32;
+        unsigned int m_bigCentCache = 32;
+        float m_similarity;
+        std::list<Centroid *> m_cache;
+        std::list<Centroid *> m_bigCents;
+
+        bool hasHit(float bestDist);
+        bool insertIfBig(Centroid* centroid); // TODO: Better name
+};
+
 
 #endif
