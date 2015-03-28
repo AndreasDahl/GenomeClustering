@@ -30,13 +30,25 @@ class GreedyClustering {
         bool m_greedyPick = true;
         bool m_lru = true;
         unsigned int m_cacheSize = 32;
-        unsigned int m_bigCentCache = 32;
+        unsigned int m_longTermCacheSize = 32;
         float m_similarity;
-        std::list<Centroid *> m_cache;
-        std::list<Centroid *> m_bigCents;
 
-        bool hasHit(float bestDist);
-        bool insertIfBig(Centroid* centroid); // TODO: Better name
+        std::list<Centroid *> m_cache;
+        std::list<Centroid *> m_longTermCache;
+
+        /**
+         * Return whether the given distance qualifies as a hit.
+         * @Param  distance  Distance to test.
+         * @Returns  true, if the given distance qualifies as a hit, false otherwise.
+         */
+        bool isHit(float distance);
+
+        /**
+         * Insert centroid into long tern cache if it fits.
+         * @Param  centroid  Centroid to be inserted into long term cache.
+         * @Returns  true, if centroid was inserted, false otherwise.
+         */
+        bool insertIntoLongTerm(Centroid *centroid); // TODO: Better name
 };
 
 
