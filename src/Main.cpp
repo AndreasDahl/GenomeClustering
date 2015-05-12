@@ -93,12 +93,30 @@ void compareLevenshteinKmer(char* file_path) {
 
 }
 
+
+void testNewLevenshtein() {
+    std::string str1 = "hej";
+    std::string str2 = "nejo";
+
+    FastaContainer f1 = FastaContainer();
+    f1.sequence = str1;
+
+    FastaContainer f2 = FastaContainer();
+    f2.sequence = str2;
+
+    float dist = distanceLevenshteinFailFast(f1, f2, 1.0f);
+
+    std::cout << dist << std::flush;
+}
+
 int main(int argc, char** argv)
 {
 	if(argc < 2)
 		return -1;
 
-	greedyClusteringTest(argv[1]);
+    testNewLevenshtein();
+
+//	greedyClusteringTest(argv[1]);
 
 //	distance_challenge(argv[1]);
 
