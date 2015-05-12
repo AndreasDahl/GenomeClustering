@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <iostream>
+#include <limits>
 #include "PrintUtils.h"
 
 
@@ -66,7 +67,7 @@ void GreedyClustering::start(FastaIO &dataIO, float (*dist)(FastaContainer &, Fa
 
         // Current didn't match anything and is a new cluster
         if (!isHit(bestDist)) {
-            Centroid *centroid = new Centroid(**it);
+            Centroid *centroid = new Centroid(current);
             pushToCache(centroid);
 
             // Data collection
