@@ -6,6 +6,7 @@
 #include "MufDifference.h"
 
 #include <math.h>
+#include <string>
 #include <iostream>
 
 /*
@@ -155,12 +156,15 @@ float distanceLevenshteinFailFast(FastaContainer& kMer1, FastaContainer& kMer2, 
                             ? str2.length() - str1.length()
                             : str1.length() - str2.length());
     int smallestLength = (int) (str1.length() < str2.length() ? str1.length() : str2.length());
+    // Maximal errors before fail-fast kicks in
+    float maxErrors = threshold * smallestLength + lengthDiff;
 
     // initialize v0 (the previous row of distances)
-    // this row is A[0][i]: edit distance for an empty s
-    // the distance is just the number of characters to delete from t
-    for (int i = 0; i < str2.length(); i++)
+    // this row is A[0][i]: edit distance for an empty str1
+    // the distance is just the number of characters to delete from str2
+    for (int i = 0; i < str2.length() + 1; i++) {
         v0[i] = i;
+    }
 
     for (int i = 0; i < str1.length(); i++)
     {
@@ -169,24 +173,28 @@ float distanceLevenshteinFailFast(FastaContainer& kMer1, FastaContainer& kMer2, 
         // first element of v1 is A[i+1][0]
         //   edit distance is delete (i+1) chars from s to match empty t
         v1[0] = i + 1;
-
+        int minErrors = v1[0];
+        
         // use formula to fill in the rest of the row
         for (int j = 0; j < str2.length(); j++)
         {
             int cost = (str1[i] == str2[j]) ? 0 : 1;
             v1[j + 1] = MIN3(v1[j] + 1, v0[j + 1] + 1, v0[j] + cost);
+            if (v1[j + 1] < minErrors)
+                minErrors = v1[j + 1];
+        }
+       
+        if (minErrors > maxErrors) {
+            // Fail Fast
+            return 1.0f;
         }
 
-        // TODO: Swap pointer instead
-        // copy v1 (current row) to v0 (previous row) for next iteration
-        for (int j = 0; j < str2.length(); j++)
-            v0[j] = v1[j];
+        // Swap pointer v0 and v1
+        int* tmp = v0;
+        v0 = v1;
+        v1 = tmp;
     }
 
-
-    std::cout << "dist: " << v1[str2.length()] << std::endl << std::flush;
-    std::cout << "diff: " << lengthDiff << std::endl << std::flush;
-    std::cout << "small: " << smallestLength << std::endl << std::flush;
     return (float)(v1[str2.length()] - lengthDiff) / smallestLength;
 }
 
