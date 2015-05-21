@@ -12,6 +12,7 @@
 #include "KMeans.h"
 #include "GreedyClustering.h"
 #include "PrintUtils.h"
+#include "InputParser.h"
 
 #include <iostream>
 #include <list>
@@ -93,7 +94,6 @@ void compareLevenshteinKmer(char* file_path) {
 
 }
 
-
 void testNewLevenshtein(char* file_path) {
 	FastaIO fastaIO;
 	fastaIO.openRead(file_path);
@@ -135,7 +135,9 @@ int main(int argc, char** argv)
 	if(argc < 2)
 		return -1;
 
-  testNewLevenshtein(argv[1]);
+    parseInput(argc, argv);
+
+//  testNewLevenshtein(argv[1]);
 
 //	greedyClusteringTest(argv[1]);
 
