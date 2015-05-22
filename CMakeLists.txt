@@ -18,7 +18,9 @@ set(SOURCE_FILES
     src/PrintUtils.cpp
     src/InputParser.h
     src/InputParser.cpp
-    src/FastaComparators.h)
+    src/FastaComparators.h
+    src/RecordWriter.h
+    src/RecordWriter.cpp)
 
 add_executable(GenomeClustering ${SOURCE_FILES})
 
