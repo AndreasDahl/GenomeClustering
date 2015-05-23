@@ -20,14 +20,17 @@ GreedyClustering::GreedyClustering(float similarity) :
     m_similarity = similarity;
 }
 
-void GreedyClustering::start(FastaIO &dataIO, float (*dist)(FastaContainer &, FastaContainer &), std::ostream *out) {
-    std::vector<int> indexes; // Used for data analysis
+void GreedyClustering::start(
+        FastaIO &dataIO,
+        float (*dist)(FastaContainer &, FastaContainer &),
+        std::ostream *out) {
+    std::vector<int> indexes;  // Used for data analysis
     int c_count = 0;
     int n = 0;
-    while(true) {
+    while (true) {
         // Load Sequence
         FastaContainer* current = new FastaContainer();
-        if(dataIO.getNextLine(*current)) {
+        if (dataIO.getNextLine(*current)) {
             delete current;
             break;
         }
@@ -41,8 +44,8 @@ void GreedyClustering::start(FastaIO &dataIO, float (*dist)(FastaContainer &, Fa
         bool hitBig = false;
         float bestDist = std::numeric_limits<float>::infinity();
         typename std::list<Centroid *>::iterator it;
-        unsigned int i = 0; // Used for data analysis
-        unsigned int index = 0; // Used for data analysis
+        unsigned int i = 0;  // Used for data analysis
+        unsigned int index = 0;  // Used for data analysis
         // Search through 'Centroids' list
         for (it = m_cache.begin(); it != m_cache.end(); ++it) {
             ++i;
@@ -73,15 +76,15 @@ void GreedyClustering::start(FastaIO &dataIO, float (*dist)(FastaContainer &, Fa
         if (!isHit(bestDist)) {
             Centroid *centroid = new Centroid(current, c_count);
             pushToCache(centroid);
-            
+
             r.type = CENTROID;
             r.clusterNumber = c_count;
-            if(out) *out << r << std::endl;
-            
+            if (out) *out << r << std::endl;
+
             c_count++;
             // Data collection
-            indexes.push_back(c_count); // TODO: Work for LRU ?
-        } else { // Current hit a cluster
+            indexes.push_back(c_count);  // TODO: Work for LRU ?
+        } else {  // Current hit a cluster
             Centroid *hit = *it;
             hit->count = hit->count + 1;
             if (m_lru) {

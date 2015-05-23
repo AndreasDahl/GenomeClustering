@@ -21,7 +21,7 @@ struct Record {
     RecordType type;    // Record Type.
     unsigned int clusterNumber;     // Cluster number.
     unsigned int sequenceLength;    // Length of the sequence.
-    float id;   // Identity to the (as a percent, or * if this is a centroid). 
+    float id;   // Identity to the (as a percent, or * if this is a centroid).
     std::string query;  // Fasta label of query sequence.
     std::string target; // Fasta label of target centroid.
 };

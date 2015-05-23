@@ -11,7 +11,7 @@
 const char DELIMITER = '\t';
 
 std::ostream& operator<<(std::ostream& out, const Record& record) {
-    switch(record.type) {
+    switch (record.type) {
         case HIT : out << "H"; break;
         case CENTROID : out << "C"; break;
     }
