@@ -96,7 +96,7 @@ void GreedyClustering::start(FastaIO &dataIO, float (*dist)(FastaContainer &, Fa
 
             r.type = HIT;
             r.clusterNumber = hit->clusterNumber;
-            r.id = bestDist;
+            r.id = 100 - (bestDist * 100);
             if (out) *out << r << std::endl;
             // Data collection
             // if(out) *out << indexes[c_count - index] << ' ' << index << std::endl;
@@ -104,6 +104,23 @@ void GreedyClustering::start(FastaIO &dataIO, float (*dist)(FastaContainer &, Fa
     }
     std::cout << std::endl << "\r" << "Seq Count:" << n << std::endl;
     std::cout << "\r" << "Cluster Count:" << c_count << std::endl;
+}
+
+void GreedyClustering::setSimilarity(float similarity) {
+    m_similarity = similarity;
+}
+
+void GreedyClustering::setCacheSize(unsigned int newCacheSize) {
+    m_cacheSize = newCacheSize / 2;
+    m_longTermCacheSize = newCacheSize - m_cacheSize;
+}
+
+float GreedyClustering::getSimilarity() {
+    return m_similarity;
+}
+
+unsigned int GreedyClustering::getCacheSize() {
+    return m_cacheSize + m_longTermCacheSize;
 }
 
 // Private Members ------------------------------------------------------------

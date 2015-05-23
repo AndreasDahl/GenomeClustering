@@ -5,6 +5,6 @@
 #ifndef _GENOMECLUSTERING_INPUTPARSER_H_
 #define _GENOMECLUSTERING_INPUTPARSER_H_
 
-void parseInput(int argc, char** argv);
+int parseInput(int argc, char** argv);     
 
 #endif //_GENOMECLUSTERING_INPUTPARSER_H_

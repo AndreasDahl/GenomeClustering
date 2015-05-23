@@ -28,6 +28,14 @@ class GreedyClustering {
 
         void start(FastaIO &dataIO, float (*dist)(FastaContainer &, FastaContainer &), std::ostream *out);
 
+        void setSimilarity(float similarity);
+
+        void setCacheSize(unsigned int newCacheSize);
+
+        unsigned int getCacheSize();
+
+        float getSimilarity();
+
     private:
         bool m_greedyPick = true;
         bool m_lru = true;
@@ -65,6 +73,8 @@ class GreedyClustering {
          * @Returns  true, if centroid was inserted, false otherwise.
          */
         bool tryInsertIntoLongTerm(Centroid *centroid); // TODO: Better name
+
+
 };
 
 
