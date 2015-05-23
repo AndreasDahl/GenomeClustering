@@ -21,20 +21,6 @@ using std::vector;
 
 using std::list;
 
-void greedyClusteringTest(char* file_path) {
-	FastaIO fastaIO;
-	fastaIO.openRead(file_path);
-
-	timestamp_t t0 = get_timestamp();
-
-	GreedyClustering(0.03f).start(fastaIO, mufDifference, &std::cout);
-	timestamp_t t1 = get_timestamp();
-
-	std::cout << "Execution took " << formatDuration(t0, t1) << " to complete." << std::endl;
-
-	fastaIO.closeRead();
-}
-
 void distance_challenge(char* file_path) {
 	FastaIO fastaIO;
 	fastaIO.openRead(file_path);
@@ -94,49 +80,9 @@ void compareLevenshteinKmer(char* file_path) {
 
 }
 
-void testNewLevenshtein(char* file_path) {
-	FastaIO fastaIO;
-	fastaIO.openRead(file_path);
-
-	vector<FastaContainer> strings;
-
-	while (true) {
-		strings.push_back(FastaContainer());
-		if(fastaIO.getNextLine(strings.back())) {
-			strings.pop_back();
-			break;
-		}
-	}
-
-    
-	timestamp_t t0 = get_timestamp();
-
-	std::cout << "size " << strings.size() << std::endl << std::flush;
-	std::ofstream myfile;
-	myfile.open ("compare.csv");
-	for (unsigned int i = 0; i < strings.size() - 1; ++i) {
-		for (unsigned int j = i + 1; j < strings.size(); ++j) {
-			//myfile << kMerDistanceLevenshtein(strings[i], strings[j]);
-	    	myfile << distanceLevenshteinFailFast(strings[i], strings[j], 0.05f);
-            myfile << std::endl;
-            //printProgress(strings.size() * i + j, strings.size() * strings.size());
-		}
-        timestamp_t t1 = get_timestamp();
-        std::cout << "Execution took " << formatDuration(t0, t1) << " to complete." << std::endl;
-	}
-	std::cout.flush();
-	myfile.close();
-
-    // float dist = distanceLevenshteinFailFast(f1, f2, 0.2f);
-}
-
 int main(int argc, char** argv)
 {
     return parseInput(argc, argv);
-
-//  testNewLevenshtein(argv[1]);
-
-//	greedyClusteringTest(argv[1]);
 
 //	distance_challenge(argv[1]);
 
