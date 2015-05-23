@@ -18,6 +18,7 @@ float mufDifferenceFailFast(FastaContainer& str1, FastaContainer& str2);
 
 float mufDifferenceHash(FastaContainer& str1, FastaContainer& str2);
 
-int kMerDistanceLevenshtein(FastaContainer& kMer1, FastaContainer& kMer2);
+float kMerDistanceLevenshtein(FastaContainer& kMer1, FastaContainer& kMer2);
+float distanceLevenshteinFailFast(FastaContainer& kMer1, FastaContainer& kMer2, float threshold);
 
 #endif

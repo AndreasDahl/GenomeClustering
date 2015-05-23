@@ -5,11 +5,9 @@
 
 #include "MufDifference.h"
 
+#include <string>
 #include <math.h>
 #include <list>
-
-#include <iostream>
-using namespace std;
 
 
 /**
@@ -311,7 +309,6 @@ int kMerTest(FastaContainer& str1, FastaContainer& str2)
     return res;
 }
 
-
 /*
 struct FastaContainer
 {
@@ -470,7 +467,7 @@ float mufDifferenceHash(FastaContainer& str1, FastaContainer& str2)
 
 #define MIN2(a, b) (a) < (b) ? (a) : (b)
 #define MIN3(a, b, c) ((a) < (b) ? ((a) < (c) ? (a) : (c)) : ((b) < (c) ? (b) : (c)))
-int kMerDistanceLevenshtein(FastaContainer& kMer1, FastaContainer& kMer2)
+float kMerDistanceLevenshtein(FastaContainer& kMer1, FastaContainer& kMer2)
 {
     unsigned int s1len, s2len, x, y, lastdiag, olddiag, prevdiag;
     char s2c;
@@ -507,8 +504,69 @@ int kMerDistanceLevenshtein(FastaContainer& kMer1, FastaContainer& kMer2)
 
     unsigned int result = column[s1len];
     delete column;
-    return (result - ((s1len - s2len > 0) ? s1len - s2len : s2len - s1len));
-    //return (float)(result - ((s1len - s2len > 0) ? s1len - s2len : s2len - s1len)) /
-    //    (float)((s1len < s2len) ? s1len : s2len);
+    //return (result - ((s1len - s2len > 0) ? s1len - s2len : s2len - s1len));
+    return (float)(result - ((s1len - s2len > 0) ? s1len - s2len : s2len - s1len)) /
+        (float)((s1len < s2len) ? s1len : s2len);
+}
+
+
+float distanceLevenshteinFailFast(FastaContainer& kMer1, FastaContainer& kMer2, float threshold)
+{
+    std::string str1 = kMer1.sequence;
+    std::string str2 = kMer2.sequence;
+    // degenerate cases
+    if (str1 == str2) return 0;
+    if (str1.length() == 0) return str1.length();
+    if (str2.length() == 0) return str2.length();
+
+    // create two work vectors of integer distances
+    int* v0 = new int[str2.length() + 1];
+    int* v1 = new int[str2.length() + 1];
+
+    // Get data for calculating relative distance.
+    int lengthDiff = (int) (str1.length() < str2.length()
+                            ? str2.length() - str1.length()
+                            : str1.length() - str2.length());
+    int smallestLength = (int) (str1.length() < str2.length() ? str1.length() : str2.length());
+    // Maximal errors before fail-fast kicks in
+    float maxErrors = threshold * smallestLength + lengthDiff;
+
+    // initialize v0 (the previous row of distances)
+    // this row is A[0][i]: edit distance for an empty str1
+    // the distance is just the number of characters to delete from str2
+    for (int i = 0; i < str2.length() + 1; i++) {
+        v0[i] = i;
+    }
+
+    for (int i = 0; i < str1.length(); i++)
+    {
+        // calculate v1 (current row distances) from the previous row v0
+
+        // first element of v1 is A[i+1][0]
+        //   edit distance is delete (i+1) chars from s to match empty t
+        v1[0] = i + 1;
+        int minErrors = v1[0];
+        
+        // use formula to fill in the rest of the row
+        for (int j = 0; j < str2.length(); j++)
+        {
+            int cost = (str1[i] == str2[j]) ? 0 : 1;
+            v1[j + 1] = MIN3(v1[j] + 1, v0[j + 1] + 1, v0[j] + cost);
+            if (v1[j + 1] < minErrors)
+                minErrors = v1[j + 1];
+        }
+       
+        if (minErrors > maxErrors) {
+            // Fail Fast
+            return 1.0f;
+        }
+
+        // Swap pointer v0 and v1
+        int* tmp = v0;
+        v0 = v1;
+        v1 = tmp;
+    }
+
+    return (float)(v1[str2.length()] - lengthDiff) / smallestLength;
 }
 

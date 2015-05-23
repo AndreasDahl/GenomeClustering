@@ -9,7 +9,7 @@
 #include <iostream>
 #include <limits>
 #include "PrintUtils.h"
-
+#include "RecordWriter.h"
 
 GreedyClustering::GreedyClustering(float similarity) :
     m_greedyPick(true),
@@ -25,11 +25,15 @@ void GreedyClustering::start(FastaIO &dataIO, float (*dist)(FastaContainer &, Fa
     int c_count = 0;
     int n = 0;
     while(true) {
+        // Load Sequence
         FastaContainer* current = new FastaContainer();
         if(dataIO.getNextLine(*current)) {
             delete current;
             break;
         }
+        // Construct record for capturing results
+        Record r;
+        r.sequenceLength = (current->sequence).length();
         // Output progress FIXME: Move somewhere else.
         if (++n % 100 == 0) {
             printProgress(dataIO.getReadFileRead(), dataIO.getReadFileLength());
@@ -50,7 +54,7 @@ void GreedyClustering::start(FastaIO &dataIO, float (*dist)(FastaContainer &, Fa
                     break;
             }
         }
-        // Did not hit in 'Centroids'. Search though bigCents. (Of if running thorough search)
+        // Did not hit in 'Centroids'. Search though bigCents. (Or if running thorough search)
         if (!isHit(bestDist) || !m_greedyPick) {
             for (it = m_longTermCache.begin(); it != m_longTermCache.end(); ++it) {
                 ++i;
@@ -67,13 +71,16 @@ void GreedyClustering::start(FastaIO &dataIO, float (*dist)(FastaContainer &, Fa
 
         // Current didn't match anything and is a new cluster
         if (!isHit(bestDist)) {
-            Centroid *centroid = new Centroid(current);
+            Centroid *centroid = new Centroid(current, c_count);
             pushToCache(centroid);
-
-            // Data collection
+            
+            r.type = CENTROID;
+            r.clusterNumber = c_count;
+            if(out) *out << r << std::endl;
+            
             c_count++;
+            // Data collection
             indexes.push_back(c_count); // TODO: Work for LRU ?
-            if(out) *out << c_count << ' ' << 0 << std::endl;
         } else { // Current hit a cluster
             Centroid *hit = *it;
             hit->count = hit->count + 1;
@@ -86,15 +93,20 @@ void GreedyClustering::start(FastaIO &dataIO, float (*dist)(FastaContainer &, Fa
                 }
                 pushToCache(hit);
             }
+
+            r.type = HIT;
+            r.clusterNumber = hit->clusterNumber;
+            r.id = bestDist;
+            if (out) *out << r << std::endl;
             // Data collection
-            if(out) *out << indexes[c_count - index] << ' ' << index << std::endl;
+            // if(out) *out << indexes[c_count - index] << ' ' << index << std::endl;
         }
     }
     std::cout << std::endl << "\r" << "Seq Count:" << n << std::endl;
     std::cout << "\r" << "Cluster Count:" << c_count << std::endl;
 }
 
-// Private Methods ------------------------------------------------------------
+// Private Members ------------------------------------------------------------
 
 bool GreedyClustering::isHit(float distance) {
     return distance < m_similarity;

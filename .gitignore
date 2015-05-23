@@ -35,3 +35,8 @@
 out/
 doc/
 /res/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake

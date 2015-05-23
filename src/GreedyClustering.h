@@ -14,9 +14,11 @@
 struct Centroid {
     FastaContainer* fasta;
     unsigned int count = 1;
+    unsigned int clusterNumber;
 
-    Centroid(FastaContainer* fasta) {
+    Centroid(FastaContainer* fasta, unsigned int clusterNumber) {
         this->fasta=fasta;
+        this->clusterNumber = clusterNumber;
     }
 };
 
