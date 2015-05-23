@@ -20,7 +20,7 @@ std::ostream& operator<<(std::ostream& out, const Record& record) {
     out << DELIMITER;
     out << record.sequenceLength;
     out << DELIMITER;
-    out.precision(2);
+    out.precision(3);
     record.type == HIT 
         ? out << record.id 
         : out << '*';
