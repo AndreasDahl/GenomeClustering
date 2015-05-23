@@ -22,61 +22,61 @@ using std::vector;
 using std::list;
 
 void distance_challenge(char* file_path) {
-	FastaIO fastaIO;
-	fastaIO.openRead(file_path);
+    FastaIO fastaIO;
+    fastaIO.openRead(file_path);
 
-	vector<FastaContainer> strings;
+    vector<FastaContainer> strings;
 
-	for (unsigned int i = 0; i < 500; ++i) {
-		strings.push_back(FastaContainer());
-		if(fastaIO.getNextLine(strings.back())) {
-			strings.pop_back();
-			break;
-		}
-	}
+    for (unsigned int i = 0; i < 500; ++i) {
+        strings.push_back(FastaContainer());
+        if(fastaIO.getNextLine(strings.back())) {
+            strings.pop_back();
+            break;
+        }
+    }
 
-	std::ofstream myfile;
-	myfile.open ("challenge.csv");
-	timestamp_t t0 = get_timestamp();
-	for (std::vector<FastaContainer>::iterator it1 = strings.begin(); it1 != strings.end(); ++it1) {
-		for (std::vector<FastaContainer>::iterator it2 = strings.begin(); it2 != strings.end(); ++it2) {
-			myfile << mufDifference(*it1, *it2);
-		}
-	}
-	timestamp_t t1 = get_timestamp();
-	myfile.close();
+    std::ofstream myfile;
+    myfile.open ("challenge.csv");
+    timestamp_t t0 = get_timestamp();
+    for (std::vector<FastaContainer>::iterator it1 = strings.begin(); it1 != strings.end(); ++it1) {
+        for (std::vector<FastaContainer>::iterator it2 = strings.begin(); it2 != strings.end(); ++it2) {
+            myfile << mufDifference(*it1, *it2);
+        }
+    }
+    timestamp_t t1 = get_timestamp();
+    myfile.close();
 
-	std::cout << "Execution took " << formatDuration(t0, t1) << " to complete";
+    std::cout << "Execution took " << formatDuration(t0, t1) << " to complete";
 }
 
 void compareLevenshteinKmer(char* file_path) {
-	FastaIO fastaIO;
-	fastaIO.openRead(file_path);
+    FastaIO fastaIO;
+    fastaIO.openRead(file_path);
 
-	vector<FastaContainer> strings;
+    vector<FastaContainer> strings;
 
-	while (true) {
-		strings.push_back(FastaContainer());
-		if(fastaIO.getNextLine(strings.back())) {
-			strings.pop_back();
-			break;
-		}
-	}
+    while (true) {
+        strings.push_back(FastaContainer());
+        if(fastaIO.getNextLine(strings.back())) {
+            strings.pop_back();
+            break;
+        }
+    }
 
-	std::cout << "size " << strings.size() << std::flush;
-	std::ofstream myfile;
-	myfile.open ("compare.csv");
-	for (unsigned int i = 0; i < strings.size() - 1; ++i) {
-		for (unsigned int j = i + 1; j < strings.size(); ++j) {
-			myfile << mufDifference(strings[i], strings[j]);
-			myfile << " ";
-			myfile << kMerDistanceLevenshtein(strings[i], strings[j]);
-			myfile << std::endl;
-		}
-		printProgress(i, strings.size());
-	}
-	std::cout.flush();
-	myfile.close();
+    std::cout << "size " << strings.size() << std::flush;
+    std::ofstream myfile;
+    myfile.open ("compare.csv");
+    for (unsigned int i = 0; i < strings.size() - 1; ++i) {
+        for (unsigned int j = i + 1; j < strings.size(); ++j) {
+            myfile << mufDifference(strings[i], strings[j]);
+            myfile << " ";
+            myfile << kMerDistanceLevenshtein(strings[i], strings[j]);
+            myfile << std::endl;
+        }
+        printProgress(i, strings.size());
+    }
+    std::cout.flush();
+    myfile.close();
 
 }
 
@@ -84,10 +84,10 @@ int main(int argc, char** argv)
 {
     return parseInput(argc, argv);
 
-//	distance_challenge(argv[1]);
+//  distance_challenge(argv[1]);
 
-//	compareLevenshteinKmer(argv[1]);
+//  compareLevenshteinKmer(argv[1]);
 
 
-	return 0;
+    return 0;
 }
