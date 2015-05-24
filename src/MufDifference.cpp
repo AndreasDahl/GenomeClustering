@@ -402,6 +402,6 @@ float distanceLevenshteinFailFast(FastaContainer& kMer1, FastaContainer& kMer2, 
         v1 = tmp;
     }
 
-    return (float)(v0[str2.length()] - lengthDiff);// / smallestLength;
+    return (float)(v0[str2.length()] - lengthDiff) / smallestLength;
 }
 
