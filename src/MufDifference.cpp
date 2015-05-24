@@ -3,81 +3,15 @@
 * @Date:   2015-03-17 12:58:21
 */
 
-#include "MufDifference.h"
-
-#include "KMerHash.h"
-
+#include <iostream>
 #include <string>
 #include <math.h>
 #include <list>
 
-/**
-* Simple array structure used for parallel comparison.
-* Template class T must have operators: =(int) and +=(T)
-*/
-/*template<class T>
-class KMerCountedArray : public KMerStructure<T>
-{
-    public:
-        KMerCountedArray(unsigned int arraySize) :
-            m_arraySize(arraySize),
-            m_iterator(0)
-        {
-            m_array = new T[arraySize];
-            for(int i = 0; i < arraySize; i++)
-                m_array[i] = 0;
-        }
+#include "MufDifference.h"
+#include "KMerHash.h"
 
-        virtual ~KMerCountedArray() {
-            delete[] m_array;
-        }
-
-        KMerCountedArray(const KMerCountedArray&) = delete;
-        KMerCountedArray& operator=(const KMerCountedArray&) = delete;
-
-        void mKerAdd(T index) { // unsigned int index, 
-            m_array[index] += 1;
-        }
-
-        bool iteratorReset() {
-            m_iterator = 0;
-            return true;
-        }
-
-        void iteratorIncrease() {
-            m_iterator += 1;
-        }
-
-        bool iteratorNotEnded() {
-            return m_iterator < m_arraySize;
-        }
-
-        T& iteratorGet() {
-            return m_array[m_iterator];
-        }
-
-    private:
-        unsigned int m_arraySize;
-        T* m_array;
-
-        unsigned int m_iterator;
-};
-
-
-
-template<class T>
-inline void generateKmer(const std::string& seq, KMerStructure<T>& data, unsigned int k)
-{
-    unsigned int seqLen = (unsigned int)seq.size()-k+1;
-    for(unsigned int i = 0; i < seqLen; i++) {
-        T kMer = 0;
-        for(unsigned int j = 0; j < k; j++) {
-            kMer <<= 2;
-            kMer |= ((T)seq[i+j] & 6) >> 1;
-        }
-        data.mKerAdd(kMer);
-    }
-}*/
+using namespace std;
 
 inline void generateHashKmer(const std::string& seq, KMerHashmap& data, unsigned int k)
 {
@@ -92,24 +26,6 @@ inline void generateHashKmer(const std::string& seq, KMerHashmap& data, unsigned
     }
 }
 
-/*template<class T>
-inline int parallelComparison(KMerCountedArray<T>& structure1, KMerCountedArray<T>& structure2)
-{
-    structure1.iteratorReset();
-    structure2.iteratorReset();
-
-    int difference = 0;
-    while(structure1.iteratorNotEnded() && structure2.iteratorNotEnded()) {
-        difference += abs((int)structure1.iteratorGet() - (int)structure2.iteratorGet());
-        structure1.iteratorIncrease();
-        structure2.iteratorIncrease();
-    }
-
-    return difference;
-}*/
-
-#include <iostream>
-using namespace std;
 int levenshteinHelper(const std::string& s1, const std::string& s2, float threshold);
 
 inline int shiftingComparison(KMerHashmap& bigStruct, KMerHashmap& smallStruct, short* indexArray)
@@ -162,7 +78,6 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
     }
 
     int k = 9;
-    int arrayLen = 1 << (k << 1); // 4^k == 2^(k*2)
     short* indexArray = new short[bigSize];
 
     for(unsigned int i = 0; i < bigSize; i++) {
@@ -178,7 +93,7 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
         generateHashKmer(smallest->sequence, smallest->kMerHash, k);
     }
     
-    int res = shiftingComparison(biggest->kMerHash, smallest->kMerHash, indexArray);
+    shiftingComparison(biggest->kMerHash, smallest->kMerHash, indexArray);
 
     bool debug = false;
 
