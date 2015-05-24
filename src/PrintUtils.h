@@ -13,4 +13,4 @@ timestamp_t get_timestamp();
 void printProgress(unsigned long current, unsigned long max);
 std::string formatDuration(timestamp_t t0, timestamp_t t1);
 
-#endif //_GENOMECLUSTERING_PRINTUTILS_H_
+#endif  // _GENOMECLUSTERING_PRINTUTILS_H_

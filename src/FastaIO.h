@@ -44,33 +44,33 @@ class FastaIO
 		FastaIO();
 		virtual ~FastaIO();
 
-		FastaIO(const FastaIO&) = delete;
-		FastaIO& operator=(const FastaIO&) = delete;
+        FastaIO(const FastaIO&) = delete;
+        FastaIO& operator=(const FastaIO&) = delete;
 
-		void closeRead();
-		void closeWrite();
+        void closeRead();
+        void closeWrite();
 
-		int openRead(const char* filename);
-		int openWrite(const char* filename);
+        int openRead(const char* filename);
+        int openWrite(const char* filename);
 
-		bool readIsOpen() const;
-		bool writeIsOpen() const;
+        bool readIsOpen() const;
+        bool writeIsOpen() const;
 
-		void writeAsync();
+        void writeAsync();
 
-		int getNextLine(FastaContainer& out);
+        int getNextLine(FastaContainer& out);
 
-		unsigned long getReadFileLength() const;
-		unsigned long getReadFileRead() const;
+        unsigned long getReadFileLength() const;
+        unsigned long getReadFileRead() const;
 
-	private:
-		std::ifstream* m_readStream;
-		std::ofstream* m_writeStream;
+    private:
+        std::ifstream* m_readStream;
+        std::ofstream* m_writeStream;
 
-		unsigned int m_nextLineNumber;
+        unsigned int m_nextLineNumber;
 
-		unsigned long m_readFileLength;
-		unsigned long m_bytesRead;
+        unsigned long m_readFileLength;
+        unsigned long m_bytesRead;
 };
 
 #endif

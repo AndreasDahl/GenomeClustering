@@ -4,34 +4,73 @@
 */
 
 #include <stdlib.h>
+#include <cstdio>
 #include <iostream>
 #include <string>
 #include <set>
 #include <regex>
 #include "InputParser.h"
+#include "MufDifference.h"
+#include "GreedyClustering.h"
 
-void parseInput(int argc, char** argv) {
+const char* HELP = {
+    "usage: %s <fasta in> <cluster out> <similarity> [<args>]\n"
+};
+
+void printHelp(char* programName) {
+    printf(HELP, programName);
+}
+
+int parseInput(int argc, char** argv) {
     std::regex stringPattern ("^--(.+)");
-    std::regex charsPattern ("^-([^-]+)");
+    std::regex charsPattern ("^-([^-])$");
 
-    std::set<std::string> arguments;
-    for (int i = 1; i < argc; ++i) {
-        std::cmatch matches;
-        if (std::regex_match(argv[i], matches, stringPattern)) {
-            arguments.insert(matches.str(1));
-        } else if (std::regex_match(argv[i], matches, charsPattern)) {
-            for (char& c : matches.str(1)) {
-                std::string s (1,c);
-                arguments.insert(s);
-            }
-        } else {
-            // TODO: Make a fuss about it (Bad input error)
+    try {
+        if (argc < 4)
+            throw 1;
+
+        // Open in
+        FastaIO fastaIO;
+        if (fastaIO.openRead(argv[1])) {
+            throw 2;
         }
+
+        // Open out
+        std::ofstream out;
+        out.open(argv[2]);
+        if (!out.is_open()) {
+            throw 3;
+        }
+
+        GreedyClustering setup(atof(argv[3]));
+             
+        for (int i = 4; i < argc; ++i) {
+            std::string argument;
+            std::cmatch matches;
+            if (std::regex_match(argv[i], matches, stringPattern)
+                    || std::regex_match(argv[i], matches, charsPattern)) {
+                argument = matches.str(1);
+            } else {
+                throw 4;
+            }
+            if (argument == "cache_size" || argument == "c") {
+                if (++i < argc) {
+                    setup.setCacheSize(atoi(argv[i]));
+                } else {
+                    throw 5;
+                }
+
+            }
+        }
+        
+        setup.start(fastaIO, mufDifference, &out);
+
+        // Close streams
+        fastaIO.closeRead();
+        out.close();
+        return 0;
+    } catch (int e) {
+        printHelp(argv[0]);
+        return e;
     }
-
-    std::cout << "myset contains:";
-    for (std::set<std::string>::iterator it=arguments.begin(); it!=arguments.end(); ++it)
-        std::cout << ' ' << *it;
-
-    std::cout << '\n';
 }

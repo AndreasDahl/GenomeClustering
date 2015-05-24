@@ -24,9 +24,17 @@ struct Centroid {
 
 class GreedyClustering {
     public:
-        GreedyClustering(float similarity);
+        explicit GreedyClustering(float similarity);
 
         void start(FastaIO &dataIO, float (*dist)(FastaContainer &, FastaContainer &), std::ostream *out);
+
+        void setSimilarity(float similarity);
+
+        void setCacheSize(unsigned int newCacheSize);
+        
+        float getSimilarity();
+
+        unsigned int getCacheSize();
 
     private:
         bool m_greedyPick = true;
@@ -65,6 +73,8 @@ class GreedyClustering {
          * @Returns  true, if centroid was inserted, false otherwise.
          */
         bool tryInsertIntoLongTerm(Centroid *centroid); // TODO: Better name
+
+
 };
 
 
