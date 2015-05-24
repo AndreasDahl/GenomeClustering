@@ -12,6 +12,7 @@
 #include "InputParser.h"
 #include "MufDifference.h"
 #include "GreedyClustering.h"
+#include "PrintUtils.h"
 
 const char* HELP = {
     "usage: %s <fasta in> <cluster out> <similarity> [<args>]\n"
@@ -63,7 +64,10 @@ int parseInput(int argc, char** argv) {
             }
         }
         
+        timestamp_t t1 = get_timestamp();
         setup.start(fastaIO, mufDifference, &out);
+        timestamp_t t2 = get_timestamp();
+        std::cout << "Execution took " << formatDuration(t1, t2) << std::endl;
 
         // Close streams
         fastaIO.closeRead();
