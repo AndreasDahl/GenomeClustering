@@ -9,76 +9,40 @@
 #include <fstream>
 #include <string>
 
+#include "KMerHash.h"
+
 class FastaContainer
 {
 	public:
 		FastaContainer() :
 			sequence(""),
-			lineNumber(0),
-			kMerLength(0),
-			k(-1),
-			m_kMer(NULL)
+			lineNumber(0)
 		{}
 
 		FastaContainer(const FastaContainer& other) :
 			sequence(other.sequence),
-			lineNumber(other.lineNumber),
-			kMerLength(other.kMerLength),
-			k(other.k),
-			m_kMer(NULL)
-		{
-			if(kMerLength > 0) {
-				m_kMer = new int[kMerLength];
-				for(unsigned int i = 0; i < kMerLength; i++)
-					m_kMer[i] = other.m_kMer[i];
-			}
-		}
-
-		~FastaContainer() {
-			if(m_kMer) delete m_kMer;
-		}
+			lineNumber(other.lineNumber)
+		{}
 
 		FastaContainer& operator=(const FastaContainer& other) {
 			if(&other != this) {
 				sequence = other.sequence;
 				lineNumber = other.lineNumber;
-				kMerLength = other.kMerLength;
-				k = other.k;
-				if(m_kMer) delete m_kMer;
-				m_kMer = (kMerLength > 0) ? new int[kMerLength] : NULL;
 			}
 			return *this;
-		}
-
-		void setKMerLength(unsigned int KMerLength) {
-			kMerLength = KMerLength;
-			if(m_kMer) delete m_kMer;
-			m_kMer = (kMerLength > 0) ? new int[kMerLength] : NULL;
-		}
-
-		int* getKMer() {
-			return m_kMer;
-		}
-
-		const int* getKMer() const {
-			return m_kMer;
 		}
 
 		std::string sequence;
 		unsigned long lineNumber;
 
-		unsigned int kMerLength;
-		unsigned int k; // Size of k
-
-	private:
-		int* m_kMer;
+		KMerHashmap kMerHash;
 };
 
 class FastaIO
 {
 	public:
 		FastaIO();
-		~FastaIO();
+		virtual ~FastaIO();
 
 		FastaIO(const FastaIO&) = delete;
 		FastaIO& operator=(const FastaIO&) = delete;

@@ -9,6 +9,8 @@ set(SOURCE_FILES
     src/FastaIO.h
     src/KMeans.cpp
     src/KMeans.h
+    src/KMerHash.cpp
+    src/KMerHash.h
     src/Main.cpp
     src/GreedyClustering.h
     src/GreedyClustering.cpp
