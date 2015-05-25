@@ -68,12 +68,12 @@ class KMerHashmap : public KMerStructure<KMer>
         KMer& iteratorGet();
 
     private:
-        unsigned int m_hashmapSize;
-        unsigned int m_hashmapMask;
-        unsigned int m_hashmapShift;
+        int m_hashmapSize;
+        int m_hashmapMask;
+        int m_hashmapShift;
         KMerHashmapNode** m_hashmap;
 
-        unsigned int m_iteratorIndex;
+        int m_iteratorIndex;
         KMerHashmapNode* m_iteratorNode;
 };
 

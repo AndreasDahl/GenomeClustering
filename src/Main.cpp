@@ -110,7 +110,4 @@ int main(int argc, char** argv)
     distance_challenge(argv[1]);
 
 //  compareLevenshteinKmer(argv[1]);
-
-
-    return 0;
 }

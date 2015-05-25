@@ -7,81 +7,13 @@
 
 #include "KMerHash.h"
 
+#include <iostream>
 #include <string>
 #include <math.h>
 #include <list>
 
-static const int s_arrayIndexSize = 16384;
-static short s_indexArray[s_arrayIndexSize];
-static bool s_initialized = false;
 
-/**
-* Simple array structure used for parallel comparison.
-* Template class T must have operators: =(int) and +=(T)
-*/
-/*template<class T>
-class KMerCountedArray : public KMerStructure<T>
-{
-    public:
-        KMerCountedArray(unsigned int arraySize) :
-            m_arraySize(arraySize),
-            m_iterator(0)
-        {
-            m_array = new T[arraySize];
-            for(int i = 0; i < arraySize; i++)
-                m_array[i] = 0;
-        }
-
-        virtual ~KMerCountedArray() {
-            delete[] m_array;
-        }
-
-        KMerCountedArray(const KMerCountedArray&) = delete;
-        KMerCountedArray& operator=(const KMerCountedArray&) = delete;
-
-        void mKerAdd(T index) { // unsigned int index, 
-            m_array[index] += 1;
-        }
-
-        bool iteratorReset() {
-            m_iterator = 0;
-            return true;
-        }
-
-        void iteratorIncrease() {
-            m_iterator += 1;
-        }
-
-        bool iteratorNotEnded() {
-            return m_iterator < m_arraySize;
-        }
-
-        T& iteratorGet() {
-            return m_array[m_iterator];
-        }
-
-    private:
-        unsigned int m_arraySize;
-        T* m_array;
-
-        unsigned int m_iterator;
-};
-
-
-
-template<class T>
-inline void generateKmer(const std::string& seq, KMerStructure<T>& data, unsigned int k)
-{
-    unsigned int seqLen = (unsigned int)seq.size()-k+1;
-    for(unsigned int i = 0; i < seqLen; i++) {
-        T kMer = 0;
-        for(unsigned int j = 0; j < k; j++) {
-            kMer <<= 2;
-            kMer |= ((T)seq[i+j] & 6) >> 1;
-        }
-        data.mKerAdd(kMer);
-    }
-}*/
+using namespace std;
 
 inline void generateHashKmer(const std::string& seq, KMerHashmap& data, unsigned int k)
 {
@@ -96,24 +28,6 @@ inline void generateHashKmer(const std::string& seq, KMerHashmap& data, unsigned
     }
 }
 
-/*template<class T>
-inline int parallelComparison(KMerCountedArray<T>& structure1, KMerCountedArray<T>& structure2)
-{
-    structure1.iteratorReset();
-    structure2.iteratorReset();
-
-    int difference = 0;
-    while(structure1.iteratorNotEnded() && structure2.iteratorNotEnded()) {
-        difference += abs((int)structure1.iteratorGet() - (int)structure2.iteratorGet());
-        structure1.iteratorIncrease();
-        structure2.iteratorIncrease();
-    }
-
-    return difference;
-}*/
-
-#include <iostream>
-using namespace std;
 int levenshteinHelper(const std::string& s1, const std::string& s2, float threshold);
 
 inline int shiftingComparison(KMerHashmap& bigStruct, KMerHashmap& smallStruct, short* indexArray)
@@ -151,8 +65,11 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2)
 
 float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
 {
-    // Set k for k-mers
+    // Set constant and static variables; and k for k-mers
     const int k = 9;
+    const int s_arrayIndexSize = 16384;
+    static short s_indexArray[s_arrayIndexSize];
+    static bool s_initialized = false;
 
     // Return 0% errors if str1 and str2 is the same object.
     if(&str1 == &str2)
@@ -167,8 +84,8 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
 
     // Find the biggest of the two inputs.
     FastaContainer *biggest, *smallest;
-    unsigned int bigSize = str1.sequence.size();
-    unsigned int smallSize = str2.sequence.size();
+    int bigSize = (int)str1.sequence.size();
+    int smallSize = (int)str2.sequence.size();
     if(bigSize > smallSize) {
         biggest = &str1;
         smallest = &str2;
@@ -324,11 +241,11 @@ int levenshteinHelper(const std::string& str1, const std::string& str2, float th
     // initialize v0 (the previous row of distances)
     // this row is A[0][i]: edit distance for an empty str1
     // the distance is just the number of characters to delete from str2
-    for (int i = 0; i < str2.length() + 1; i++) {
+    for (int i = 0; i < (int)str2.length() + 1; i++) {
         v0[i] = i;
     }
 
-    for (int i = 0; i < str1.length(); i++)
+    for (int i = 0; i < (int)str1.length(); i++)
     {
         // calculate v1 (current row distances) from the previous row v0
 
@@ -338,7 +255,7 @@ int levenshteinHelper(const std::string& str1, const std::string& str2, float th
         int minErrors = v1[0];
         
         // use formula to fill in the rest of the row
-        for (int j = 0; j < str2.length(); j++)
+        for (int j = 0; j < (int)str2.length(); j++)
         {
             int cost = ((str1[i]|32) == (str2[j]|32)) ? 0 : 1;
             v1[j + 1] = MIN3(v1[j] + 1, v0[j + 1] + 1, v0[j] + cost);
@@ -386,11 +303,11 @@ float distanceLevenshteinFailFast(FastaContainer& kMer1, FastaContainer& kMer2, 
     // initialize v0 (the previous row of distances)
     // this row is A[0][i]: edit distance for an empty str1
     // the distance is just the number of characters to delete from str2
-    for (int i = 0; i < str2.length() + 1; i++) {
+    for (int i = 0; i < (int)str2.length() + 1; i++) {
         v0[i] = i;
     }
 
-    for (int i = 0; i < str1.length(); i++)
+    for (int i = 0; i < (int)str1.length(); i++)
     {
         // calculate v1 (current row distances) from the previous row v0
 
@@ -400,7 +317,7 @@ float distanceLevenshteinFailFast(FastaContainer& kMer1, FastaContainer& kMer2, 
         int minErrors = v1[0];
         
         // use formula to fill in the rest of the row
-        for (int j = 0; j < str2.length(); j++)
+        for (int j = 0; j < (int)str2.length(); j++)
         {
             int cost = ((str1[i]|32) == (str2[j]|32)) ? 0 : 1;
             v1[j + 1] = MIN3(v1[j] + 1, v0[j + 1] + 1, v0[j] + cost);

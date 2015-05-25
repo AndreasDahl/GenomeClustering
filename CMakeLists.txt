@@ -26,4 +26,4 @@ set(SOURCE_FILES
 
 add_executable(GenomeClustering ${SOURCE_FILES})
 
-add_definitions(-std=c++11)
+add_definitions(-std=c++11 -Wall)

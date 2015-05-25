@@ -12,19 +12,20 @@
 #include "InputParser.h"
 #include "MufDifference.h"
 #include "GreedyClustering.h"
+#include "PrintUtils.h"
 
 const char* HELP = {
     "usage: %s <fasta in> <cluster out> <similarity> [<args>]\n"
 };
+
+const std::regex STRING_PATTERN ("^--(.+)");
+const std::regex CHARS_PATTERN ("^-([^-])$");
 
 void printHelp(char* programName) {
     printf(HELP, programName);
 }
 
 int parseInput(int argc, char** argv) {
-    std::regex stringPattern ("^--(.+)");
-    std::regex charsPattern ("^-([^-])$");
-
     try {
         if (argc < 4)
             throw 1;
@@ -47,8 +48,8 @@ int parseInput(int argc, char** argv) {
         for (int i = 4; i < argc; ++i) {
             std::string argument;
             std::cmatch matches;
-            if (std::regex_match(argv[i], matches, stringPattern)
-                    || std::regex_match(argv[i], matches, charsPattern)) {
+            if (std::regex_match(argv[i], matches, STRING_PATTERN)
+                    || std::regex_match(argv[i], matches, CHARS_PATTERN)) {
                 argument = matches.str(1);
             } else {
                 throw 4;
@@ -63,7 +64,10 @@ int parseInput(int argc, char** argv) {
             }
         }
         
+        timestamp_t t1 = get_timestamp();
         setup.start(fastaIO, mufDifference, &out);
+        timestamp_t t2 = get_timestamp();
+        std::cout << "Execution took " << formatDuration(t1, t2) << std::endl;
 
         // Close streams
         fastaIO.closeRead();

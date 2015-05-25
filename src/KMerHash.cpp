@@ -59,7 +59,7 @@ bool KMerHashmap::isCreated() const
 
 void KMerHashmap::createHashMap(unsigned int numElements, unsigned int kMerBits)
 {
-    m_hashmapSize = bitCap(numElements / 2);
+    m_hashmapSize = (int)bitCap(numElements / 2);
     m_hashmapMask = m_hashmapSize - 1;
 
     m_hashmapShift = 0;
