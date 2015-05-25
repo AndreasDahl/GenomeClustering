@@ -21,13 +21,36 @@ using std::vector;
 
 using std::list;
 
+void distance_test(char* file_path) {
+    FastaIO fastaIO;
+    fastaIO.openRead(file_path);
+
+    const int numTests = 50;
+    FastaContainer seq[numTests];
+    for(int i = 0; i < numTests; i++) {
+        fastaIO.getNextLine(seq[i]);
+    }    
+
+    timestamp_t t0 = get_timestamp();
+    for(int i = 0; i < numTests; i++)
+    for(int j = 0; j < numTests; j++) {
+        mufDifference(seq[i], seq[j], 0.05f);
+        //std::cout << "MufDiff: " << mufDifference(seq[i], seq[j], 1.0f) << std::endl;
+        //std::cout << "Leven: " << distanceLevenshteinFailFast(seq[i], seq[j], 1.0f) << std::endl << std::endl;
+    }
+    timestamp_t t1 = get_timestamp();
+    std::cout << "Execution took " << formatDuration(t0, t1) << " to complete" << std::endl;
+
+    fastaIO.closeRead();
+}
+
 void distance_challenge(char* file_path) {
     FastaIO fastaIO;
     fastaIO.openRead(file_path);
 
     vector<FastaContainer> strings;
 
-    for (unsigned int i = 0; i < 500; ++i) {
+    for (unsigned int i = 0; i < 50; ++i) {
         strings.push_back(FastaContainer());
         if(fastaIO.getNextLine(strings.back())) {
             strings.pop_back();
@@ -40,7 +63,7 @@ void distance_challenge(char* file_path) {
     timestamp_t t0 = get_timestamp();
     for (std::vector<FastaContainer>::iterator it1 = strings.begin(); it1 != strings.end(); ++it1) {
         for (std::vector<FastaContainer>::iterator it2 = strings.begin(); it2 != strings.end(); ++it2) {
-            myfile << mufDifference(*it1, *it2);
+            myfile << distanceLevenshteinFailFast(*it1, *it2, 1.0f);
         }
     }
     timestamp_t t1 = get_timestamp();
@@ -82,9 +105,9 @@ void compareLevenshteinKmer(char* file_path) {
 
 int main(int argc, char** argv)
 {
-    return parseInput(argc, argv);
+    //return parseInput(argc, argv);
 
-//  distance_challenge(argv[1]);
+    distance_challenge(argv[1]);
 
 //  compareLevenshteinKmer(argv[1]);
 

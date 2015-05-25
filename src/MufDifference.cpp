@@ -11,6 +11,10 @@
 #include <math.h>
 #include <list>
 
+static const int s_arrayIndexSize = 16384;
+static short s_indexArray[s_arrayIndexSize];
+static bool s_initialized = false;
+
 /**
 * Simple array structure used for parallel comparison.
 * Template class T must have operators: =(int) and +=(T)
@@ -147,6 +151,21 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2)
 
 float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
 {
+    // Set k for k-mers
+    const int k = 9;
+
+    // Return 0% errors if str1 and str2 is the same object.
+    if(&str1 == &str2)
+        return 0.0f;
+
+    // Initialized s_indexArray. s_indexArray is maintained by the main loop.
+    if(!s_initialized) {
+        s_initialized = true;
+        for(int i = 0; i < s_arrayIndexSize; i++)
+            s_indexArray[i] = -1;
+    }
+
+    // Find the biggest of the two inputs.
     FastaContainer *biggest, *smallest;
     unsigned int bigSize = str1.sequence.size();
     unsigned int smallSize = str2.sequence.size();
@@ -161,14 +180,10 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
         smallest = &str1;
     }
 
-    int k = 9;
-    int arrayLen = 1 << (k << 1); // 4^k == 2^(k*2)
-    short* indexArray = new short[bigSize];
+    // Calculate the allowed number of errors.
+    int allowedErrors = (int)ceil((float)smallSize * threshold);
 
-    for(unsigned int i = 0; i < bigSize; i++) {
-        indexArray[i] = -1;
-    }
-
+    // Build the hashmaps is they don't exists.
     if(!biggest->kMerHash.isCreated()) {
         biggest->kMerHash.createHashMap(bigSize, k<<1);
         generateHashKmer(biggest->sequence, biggest->kMerHash, k);
@@ -177,22 +192,25 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
         smallest->kMerHash.createHashMap(smallSize, k<<1);
         generateHashKmer(smallest->sequence, smallest->kMerHash, k);
     }
+
     
-    int res = shiftingComparison(biggest->kMerHash, smallest->kMerHash, indexArray);
+    int kMerManhattanDistance = shiftingComparison(biggest->kMerHash, smallest->kMerHash, s_indexArray) >> 1;
+    if(kMerManhattanDistance/k > allowedErrors)
+        return (float)(kMerManhattanDistance/k);
 
     bool debug = false;
 
-    if(debug) cout << biggest->sequence << endl;
+    /*if(debug) cout << biggest->sequence << endl;
     if(debug) cout << smallest->sequence << endl << endl;
 
-    //cout << bigSize << "-" << smallSize << " difference: " << bigSize-smallSize << endl;
-    //cout << "K-mer distance: " << res << endl;
     if(debug) {
+        cout << bigSize << "-" << smallSize << " difference: " << bigSize-smallSize << endl;
+        cout << "K-mer distance: " << res << endl;
         for(int i = 0; i < bigSize; i++) {
-            if(indexArray[i] >= 0) cout << i << ":" << indexArray[i] << ", ";
+            if(s_indexArray[i] >= 0) cout << i << ":" << s_indexArray[i] << ", ";
         }
         cout << endl << endl;
-    }
+    }*/
 
     int difference = 0;
     int lastHitB = -1;
@@ -200,32 +218,33 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
     int firstHitB = -1;
     int firstHitS = -1;
     for(int i = 0; i < bigSize; i++) {
-        if(indexArray[i] >= 0 && // Hit
-            ((i-1 > 0 && indexArray[i-1] >= 0) || (i+1 < bigSize && indexArray[i+1] >= 0)) && // Not solo hit: --+---
-            indexArray[i] > lastHitS && // Not less then previous
+        if(s_indexArray[i] >= 0 && // Hit
+            ((i-1 > 0 && s_indexArray[i-1] >= 0) || (i+1 < bigSize && s_indexArray[i+1] >= 0)) && // Not solo hit: --+---
+            s_indexArray[i] > lastHitS && // Not less then previous
             true) // Not heigher than next TODO
         { 
             if(i-1 != lastHitB && firstHitB >= 0) { // When hit, last index can't be hit (there must be a hole in hits)
                 int missLenB = i - lastHitB;
-                int missLenS = indexArray[i] - lastHitS;
+                int missLenS = s_indexArray[i] - lastHitS;
                 difference += levenshteinHelper(
-                    biggest->sequence.substr(lastHitB, missLenB),
-                    smallest->sequence.substr(lastHitS, missLenS), 1.0f);
+                    biggest->sequence.substr(lastHitB+k, missLenB-k),
+                    smallest->sequence.substr(lastHitS+k, missLenS-k), 1.0f);
 
-                if(debug) cout << "B(" << lastHitB << ", " << missLenB << ") S(" << lastHitS << ", " << missLenS << ")\n";
-                if(debug) cout << biggest->sequence.substr(lastHitB, missLenB) << endl;
-                if(debug) cout << smallest->sequence.substr(lastHitS, missLenS) << endl;
-                if(debug) cout << "Diff: " << difference << endl;
+                /*if(debug) cout << "B(" << lastHitB << ", " << missLenB << ") S(" << lastHitS << ", " << missLenS << ")\n";
+                if(debug) cout << biggest->sequence.substr(lastHitB+k, missLenB-k) << endl;
+                if(debug) cout << smallest->sequence.substr(lastHitS+k, missLenS-k) << endl;
+                if(debug) cout << "Diff: " << difference << endl;*/
             }
             if(lastHitB == -1) { // Set first hit
                 firstHitB = i;
-                firstHitS = indexArray[i];
+                firstHitS = s_indexArray[i];
             }
             lastHitB = i;
-            lastHitS = indexArray[i];
+            lastHitS = s_indexArray[i];
+            s_indexArray[i] = -1;
         }
     }
-    if(debug) cout << "--Start the end" << endl << flush;
+    //if(debug) cout << "--Start the end" << endl << flush;
     if(lastHitB >= 0) {
         // Handle sides (first)
         int firstDiff = firstHitB - firstHitS;
@@ -277,8 +296,6 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
     else { // 0% hit -> at least (100-(1/k))% error : (return as error)
         difference += bigSize;
     }
-
-    delete[] indexArray;
 
     return (float)difference / (float)smallSize;
 }
