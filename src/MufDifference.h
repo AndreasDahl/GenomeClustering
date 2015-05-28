@@ -8,11 +8,11 @@
 
 #include "FastaIO.h"
 
+void initializeMufDifference();
+void uninitializeMufDifference();
+
 float mufDifference(FastaContainer& str1, FastaContainer& str2);
 float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold);
-
-//int createCountedKmer(FastaContainer& str, unsigned int k);
-//int createCountedKmer(FastaContainer& str1, FastaContainer& str2, unsigned int k);
 
 float distanceLevenshteinFailFast(FastaContainer& kMer1, FastaContainer& kMer2, float threshold);
 

@@ -105,9 +105,11 @@ void compareLevenshteinKmer(char* file_path) {
 
 int main(int argc, char** argv)
 {
+    initializeMufDifference();
     //return parseInput(argc, argv);
 
     distance_challenge(argv[1]);
 
 //  compareLevenshteinKmer(argv[1]);
+    uninitializeMufDifference();
 }
