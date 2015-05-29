@@ -277,7 +277,7 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
                                              allowedErrors - difference);
 
             if(difference > allowedErrors) {
-                return 2.0f;
+                return 1.0f;
             }
             /*cout << "B(" << lastHitB << ", " << missLenB << ") S(" << lastHitS << ", " << missLenS << ")\n";
             cout << biggest->sequence.substr(lastHitB, missLenB) << endl;
@@ -325,7 +325,7 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
         }
 
         if(difference > allowedErrors) {
-            return 3.0f;
+            return 1.0f;
         }
 
         // Handle sides (last)
@@ -337,7 +337,7 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
                                              &smallest->sequence.data()[lastHitS], firstToEnd,
                                              allowedErrors - difference);
             if(difference > allowedErrors) {
-                return 4.0f;
+                return 1.0f;
             }
         }
 
@@ -361,7 +361,7 @@ float distanceLevenshteinFailFast(FastaContainer& kMer1, FastaContainer& kMer2, 
     std::string str1 = kMer1.sequence;
     std::string str2 = kMer2.sequence;
     // degenerate cases
-    if (&str1 == &str2) return 0;
+    if (&str1 == &str2) return 0.0f;
     if (str1.length() == 0) return str1.length();
     if (str2.length() == 0) return str2.length();
 
@@ -415,9 +415,11 @@ float distanceLevenshteinFailFast(FastaContainer& kMer1, FastaContainer& kMer2, 
         v1 = tmp;
     }
 
+    int result = v0[str2.length()];
+
     delete[] v0;
     delete[] v1;
 
-    return (float)(v0[str2.length()]) / smallestLength;
+    return (float)(result - lengthDiff) / smallestLength;
 }
 

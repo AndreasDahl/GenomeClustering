@@ -18,25 +18,26 @@
 #include <list>
 
 using std::vector;
-
 using std::list;
 
 void distance_test(char* file_path) {
     FastaIO fastaIO;
     fastaIO.openRead(file_path);
 
-    const int numTests = 50;
+    const int numTests = 100;
     FastaContainer seq[numTests];
     for(int i = 0; i < numTests; i++) {
         fastaIO.getNextLine(seq[i]);
     }    
 
     timestamp_t t0 = get_timestamp();
+    float fail = 0.05f;
     for(int i = 0; i < numTests; i++)
     for(int j = 0; j < numTests; j++) {
-        mufDifference(seq[i], seq[j], 0.05f);
-        //std::cout << "MufDiff: " << mufDifference(seq[i], seq[j], 1.0f) << std::endl;
-        //std::cout << "Leven: " << distanceLevenshteinFailFast(seq[i], seq[j], 1.0f) << std::endl << std::endl;
+        float d1 = mufDifference(seq[i], seq[j], fail);
+        float d2 = distanceLevenshteinFailFast(seq[i], seq[j], fail);
+        if((d1 > fail && d2 < fail) || (d1 < fail && d2 > fail))
+            std::cout << "Error: " << i << ":" << j << " _ " << d1 << " : " << d2 << std::endl;
     }
     timestamp_t t1 = get_timestamp();
     std::cout << "Execution took " << formatDuration(t0, t1) << " to complete" << std::endl;
@@ -106,10 +107,11 @@ void compareLevenshteinKmer(char* file_path) {
 int main(int argc, char** argv)
 {
     initializeMufDifference();
-    //return parseInput(argc, argv);
+    //parseInput(argc, argv);
 
-    distance_challenge(argv[1]);
+    distance_test(argv[1]);
 
 //  compareLevenshteinKmer(argv[1]);
     uninitializeMufDifference();
+    return 0;
 }
