@@ -93,7 +93,36 @@ def analyse_comparisons():
     plt.plot(plt.xlim(), plt.ylim(), c='r')
 
 
+def analyse_comparisons2():
+    data = load_data("res/muf_lev_silva_unfinal_200.csv", ';')
+    data = data.astype(float)
+    plt.figure()
+    plt.axis([0, 1, 0, 1])
+    plt.plot([0.95, 0.95], plt.ylim(), c='r')
+    plt.plot(plt.xlim(), [0.95, 0.95])
+    plt.xlabel("levenshtein")
+    plt.ylabel("k-mer")
+
+    # Distance comparison
+    plt.scatter(data[:, 2], data[:, 0], marker='o')
+    plt.plot(plt.xlim(), plt.ylim(), c='r')
+
+
+    # Box plots
+    plt.figure()
+    plt.boxplot(data[:,[1,3]], whis=[5,95])
+
+    print "MufDifference Speeds\nMedian: %f\nAvg: %f" % (np.median(data[:,1]), np.average(data[:,1]))
+    print "Levenshtein Speeds\nMedian: %f\nAvg: %f" % (np.median(data[:,3]), np.average(data[:,3]))
+
+    print "Levenshtein takes", np.median(data[:, 3]) / np.median(data[:, 1]), "times the time of MufDifference"
+
+    print [(muf, lev) for [muf, _, lev, _] in data]
+
+
+
+
 if __name__ == "__main__":
-    analyse_comparisons()
+    analyse_comparisons2()
 
     plt.show()
