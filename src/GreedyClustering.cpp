@@ -118,6 +118,14 @@ void GreedyClustering::setCacheSize(unsigned int newCacheSize) {
     m_longTermCacheSize = newCacheSize - m_cacheSize;
 }
 
+void GreedyClustering::setLRUSize(unsigned int newSize) {
+    m_cacheSize = newSize;
+}
+
+void GreedyClustering::setLFUSize(unsigned int newSize) {
+    m_longTermCacheSize = newSize;
+}
+
 float GreedyClustering::getSimilarity() {
     return m_similarity;
 }

@@ -60,7 +60,18 @@ int parseInput(int argc, char** argv) {
                 } else {
                     throw 5;
                 }
-
+            } else if (argument == "lru_size" || argument == "r") {
+                if (++i < argc) {
+                    setup.setLRUSize(atoi(argv[i]));
+                } else {
+                    throw 5;
+                }
+            } else if (argument == "lfu_size" || argument == "f") {
+                if (++i < argc) {
+                    setup.setLFUSize(atoi(argv[i]));
+                } else {
+                    throw 5;
+                }
             }
         }
         

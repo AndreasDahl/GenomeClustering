@@ -26,12 +26,16 @@ class GreedyClustering {
     public:
         explicit GreedyClustering(float similarity);
 
-        void start(FastaIO &dataIO, float (*dist)(FastaContainer &, FastaContainer &), std::ostream *out);
+        void start(FastaIO &dataIO, float (*dist)(FastaContainer &, FastaContainer &, float), std::ostream *out);
 
         void setSimilarity(float similarity);
 
         void setCacheSize(unsigned int newCacheSize);
-        
+       
+        void setLRUSize(unsigned int newSize);
+
+        void setLFUSize(unsigned int newSize);
+
         float getSimilarity();
 
         unsigned int getCacheSize();
