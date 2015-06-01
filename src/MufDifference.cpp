@@ -13,6 +13,9 @@
 #include <vector>
 #include <list>
 
+using std::list;
+using std::vector;
+
 using namespace std;
 
 struct IndexPair
@@ -58,7 +61,7 @@ static void reSizeSortedIndices()
 static int levenshteinHelper2(const char* str1, int strSize1, const char* str2, int strSize2, int maxErrors)
 {
     if(str1 == str2 || strSize1 <= 0 || strSize2 <= 0) {
-        return 0;
+        return abs(strSize1 - strSize2);
     }
 
     // Perform linear search to find first error
@@ -66,7 +69,7 @@ static int levenshteinHelper2(const char* str1, int strSize1, const char* str2, 
         strSize1 -= 1;
         strSize2 -= 1;
         if(strSize1 <= 0 || strSize2 <= 0) {
-            return 0;
+            return abs(strSize1 - strSize2);
         }
         str1++;
         str2++;
@@ -96,7 +99,7 @@ static int levenshteinHelper2(const char* str1, int strSize1, const char* str2, 
                 currentMin = currArray[j];
         }
 
-        if(currentMin > maxErrors) {
+        if(currentMin > maxErrors) { // Fail fast
             delete[] prevArray;
             delete[] currArray;
             return currentMin;
@@ -157,8 +160,12 @@ static int shiftingComparison(KMerHashmap& bigStruct, KMerHashmap& smallStruct, 
 }
 
 // Takes a sorted vector
-static void removeCrossingIndices(vector<IndexPair>& sortedList)
+static void removeCrossingIndices(vector<IndexPair>& sortedList, int maxErrorLength)
 {
+    /*for(int i = 0; i < (int)sortedList.size(); i++) {
+        cout << "(" << sortedList[i].i1 << ":" << sortedList[i].i2 << "), ";
+    } cout << endl << endl;*/
+
     int last = -1;
     for(int i = 0; i < (int)sortedList.size(); i++) {
         int current = sortedList[i].i2;
@@ -176,13 +183,51 @@ static void removeCrossingIndices(vector<IndexPair>& sortedList)
                     sortedList.erase(sortedList.begin()+(i-c), sortedList.begin()+i);
                     last = (i-c-1 < 0) ? -1 : sortedList[i-c-1].i2; // When deleting back set last to before deletion
                     i -= c+1;
-                    //if(i < 0) i = 0;
                     break;
                 }
                 c += 1;
             }
         }
     }
+
+    /*for(int i = 0; i < (int)sortedList.size(); i++) {
+        cout << "(" << sortedList[i].i1 << ":" << sortedList[i].i2 << "), ";
+    } cout << endl << endl;
+
+    // Find longest common sub-seq
+    int longestIndex = 0;
+    int bestCounter = 0;
+    int counter = 1;
+    int seqStart = sortedList[0].i1;
+    int seqLast = seqStart;
+    for(int i = 1; i < (int)sortedList.size(); i++) {
+        if(sortedList[i].i1 - 1 == seqLast) {
+            seqLast += 1;
+            counter += 1;
+        } else {
+            if(counter > bestCounter) {
+                bestCounter = counter;
+                longestIndex = i - counter + 1;
+            }
+            counter = 1;
+            seqStart = sortedList[i].i1;
+            seqLast = seqStart;
+        }
+    }
+
+    int pairDifference = abs(sortedList[longestIndex].i1 - sortedList[longestIndex].i2);
+    int removeDifference = pairDifference + maxErrorLength;
+
+    for(int i = 0; i < (int)sortedList.size(); i++) {
+        if(abs(sortedList[i].i1 - sortedList[i].i2) > removeDifference) {
+            sortedList.erase(sortedList.begin()+i);
+            i -= 1;
+        }
+    }
+
+    for(int i = 0; i < (int)sortedList.size(); i++) {
+        cout << "(" << sortedList[i].i1 << ":" << sortedList[i].i2 << "), ";
+    } cout << endl << endl;*/
 }
 
 float mufDifference(FastaContainer& str1, FastaContainer& str2)
@@ -253,7 +298,7 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
     }
 
     // Remove crossing values
-    removeCrossingIndices(sortedList);
+    removeCrossingIndices(sortedList, allowedErrors);
 
     //cout << biggest->sequence << endl << endl;
     //cout << smallest->sequence << endl << endl;
@@ -353,7 +398,7 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
         difference += bigSize;
     }
 
-    return (float)(difference - (bigSize - smallSize)) / (float)smallSize;
+    return (float)(difference) / (float)smallSize;
 }
 
 float distanceLevenshteinFailFast(FastaContainer& kMer1, FastaContainer& kMer2, float threshold)
@@ -362,8 +407,8 @@ float distanceLevenshteinFailFast(FastaContainer& kMer1, FastaContainer& kMer2, 
     std::string str2 = kMer2.sequence;
     // degenerate cases
     if (&str1 == &str2) return 0.0f;
-    if (str1.length() == 0) return str1.length();
-    if (str2.length() == 0) return str2.length();
+    if (str1.length() == 0) return str2.length();
+    if (str2.length() == 0) return str1.length();
 
     // create two work vectors of integer distances
     int* v0 = new int[str2.length() + 1];
