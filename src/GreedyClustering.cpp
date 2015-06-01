@@ -22,7 +22,7 @@ GreedyClustering::GreedyClustering(float similarity) :
 
 void GreedyClustering::start(
         FastaIO &dataIO,
-        float (*dist)(FastaContainer &, FastaContainer &),
+        float (*dist)(FastaContainer &, FastaContainer &, float),
         std::ostream *out) {
     std::vector<int> indexes;  // Used for data analysis
     int c_count = 0;
@@ -37,8 +37,8 @@ void GreedyClustering::start(
         // Construct record for capturing results
         Record r;
         r.sequenceLength = (current->sequence).length();
-        // Output progress FIXME: Move somewhere else.
-        if (++n % 100 == 0) {
+        // Output progress.
+        if (++n % 500 == 0) {
             printProgress(dataIO.getReadFileRead(), dataIO.getReadFileLength());
         }
         bool hitBig = false;
@@ -49,7 +49,7 @@ void GreedyClustering::start(
         // Search through 'Centroids' list
         for (it = m_cache.begin(); it != m_cache.end(); ++it) {
             ++i;
-            float distance = dist(*current, *(*it)->fasta);
+            float distance = dist(*current, *(*it)->fasta, m_similarity);
             if (isHit(distance) && distance < bestDist) {
                 index = i;
                 bestDist = distance;
@@ -61,7 +61,7 @@ void GreedyClustering::start(
         if (!isHit(bestDist) || !m_greedyPick) {
             for (it = m_longTermCache.begin(); it != m_longTermCache.end(); ++it) {
                 ++i;
-                float distance = dist(*current, *(*it)->fasta);
+                float distance = dist(*current, *(*it)->fasta, m_similarity);
                 if (isHit(distance) && distance < bestDist) {
                     index = i;
                     bestDist = distance;
@@ -101,8 +101,6 @@ void GreedyClustering::start(
             r.clusterNumber = hit->clusterNumber;
             r.id = 100 - (bestDist * 100);
             if (out) *out << r << std::endl;
-            // Data collection
-            // if(out) *out << indexes[c_count - index] << ' ' << index << std::endl;
         }
     }
     std::cout << std::endl << "\r" << "Seq Count:" << n << std::endl;
