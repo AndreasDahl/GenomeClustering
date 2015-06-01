@@ -74,12 +74,13 @@ void distance_challenge(char* file_path) {
 }
 
 void compareLevenshteinKmer(char* file_path) {
+    unsigned int s_count = 250;
     FastaIO fastaIO;
     fastaIO.openRead(file_path);
 
     vector<FastaContainer> strings;
 
-    while (true) {
+    for (unsigned int i = 0; i < s_count; ++i) {
         strings.push_back(FastaContainer());
         if(fastaIO.getNextLine(strings.back())) {
             strings.pop_back();
@@ -87,17 +88,22 @@ void compareLevenshteinKmer(char* file_path) {
         }
     }
 
-    std::cout << "size " << strings.size() << std::flush;
+    std::cout << "size " << s_count << std::flush;
     std::ofstream myfile;
     myfile.open ("compare.csv");
-    for (unsigned int i = 0; i < strings.size() - 1; ++i) {
+    for (unsigned int i = 0; i < s_count - 1; ++i) {
+        printProgress(i, s_count);
         for (unsigned int j = i + 1; j < strings.size(); ++j) {
-            myfile << mufDifference(strings[i], strings[j]);
-            myfile << " ";
-            myfile << distanceLevenshteinFailFast(strings[i], strings[j], 1.0f);
+            timestamp_t t0 = get_timestamp();
+            myfile << 1.0f - mufDifference(strings[i], strings[j]);
+            timestamp_t t1 = get_timestamp();
+            myfile << ';' << t1 - t0 << ';';
+            timestamp_t t2 = get_timestamp();
+            myfile << 1.0f - distanceLevenshteinFailFast(strings[i], strings[j], 1.0f);
+            timestamp_t t3 = get_timestamp();
+            myfile << ';' << t3 - t2;
             myfile << std::endl;
         }
-        printProgress(i, strings.size());
     }
     std::cout.flush();
     myfile.close();
