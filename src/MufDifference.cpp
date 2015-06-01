@@ -353,7 +353,7 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
         difference += bigSize;
     }
 
-    return (float)difference / (float)smallSize;
+    return (float)(difference - (bigSize - smallSize)) / (float)smallSize;
 }
 
 float distanceLevenshteinFailFast(FastaContainer& kMer1, FastaContainer& kMer2, float threshold)
