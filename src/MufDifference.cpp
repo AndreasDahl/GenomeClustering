@@ -131,29 +131,38 @@ static void generateHashKmer(const std::string& seq, KMerHashmap& data, unsigned
     }
 }
 
-static int shiftingComparison(KMerHashmap& bigStruct, KMerHashmap& smallStruct, std::list<IndexPair>& pairList)
+static int shiftingComparison(KMerHashmap& bigStruct, KMerHashmap& smallStruct, int* pairList)
 {
     bigStruct.iteratorReset();
     smallStruct.iteratorReset();
 
     int difference = 0;
     while(bigStruct.iteratorNotEnded() && smallStruct.iteratorNotEnded()) {
-        KMer t1 = bigStruct.iteratorGet();
-        KMer t2 = smallStruct.iteratorGet();
-        if(t1.value == t2.value) {
+        KMer* t1 = bigStruct.iteratorGet();
+        KMer* t2 = smallStruct.iteratorGet();
+        if(t1->value == t2->value) {
             bigStruct.iteratorIncrease();
             smallStruct.iteratorIncrease();
-            pairList.push_back(IndexPair(t1.index, t2.index));
+            pairList[t1->index] = t2->index;
         }
         else {
             difference += 1;
-            if(t1.value < t2.value) {
+            if(t1->value < t2->value) {
                 bigStruct.iteratorIncrease();
             }
             else { // t1 > t2
                 smallStruct.iteratorIncrease();
             }
         }
+    }
+
+    while(bigStruct.iteratorNotEnded()) {
+        difference += 1;
+        bigStruct.iteratorIncrease();
+    }
+    while(smallStruct.iteratorNotEnded()) {
+        difference += 1;
+        smallStruct.iteratorIncrease();
     }
 
     return difference;
@@ -189,45 +198,6 @@ static void removeCrossingIndices(vector<IndexPair>& sortedList, int maxErrorLen
             }
         }
     }
-
-    /*for(int i = 0; i < (int)sortedList.size(); i++) {
-        cout << "(" << sortedList[i].i1 << ":" << sortedList[i].i2 << "), ";
-    } cout << endl << endl;
-
-    // Find longest common sub-seq
-    int longestIndex = 0;
-    int bestCounter = 0;
-    int counter = 1;
-    int seqStart = sortedList[0].i1;
-    int seqLast = seqStart;
-    for(int i = 1; i < (int)sortedList.size(); i++) {
-        if(sortedList[i].i1 - 1 == seqLast) {
-            seqLast += 1;
-            counter += 1;
-        } else {
-            if(counter > bestCounter) {
-                bestCounter = counter;
-                longestIndex = i - counter + 1;
-            }
-            counter = 1;
-            seqStart = sortedList[i].i1;
-            seqLast = seqStart;
-        }
-    }
-
-    int pairDifference = abs(sortedList[longestIndex].i1 - sortedList[longestIndex].i2);
-    int removeDifference = pairDifference + maxErrorLength;
-
-    for(int i = 0; i < (int)sortedList.size(); i++) {
-        if(abs(sortedList[i].i1 - sortedList[i].i2) > removeDifference) {
-            sortedList.erase(sortedList.begin()+i);
-            i -= 1;
-        }
-    }
-
-    for(int i = 0; i < (int)sortedList.size(); i++) {
-        cout << "(" << sortedList[i].i1 << ":" << sortedList[i].i2 << "), ";
-    } cout << endl << endl;*/
 }
 
 float mufDifference(FastaContainer& str1, FastaContainer& str2)
@@ -278,22 +248,36 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
     int allowedErrors = (int)ceil((float)smallSize * threshold);
 
     // Run Manhattan-difference on hashmaps, and save the pair-list
-    std::list<IndexPair> pairList;
-    int manDiff = (shiftingComparison(biggest->kMerHash, smallest->kMerHash, pairList) -
-        (bigSize - smallSize)) >> 1;
-    if(manDiff/k > allowedErrors) {
+    int manDiff = (shiftingComparison(biggest->kMerHash, smallest->kMerHash, MufDiffGlobals::sortedIndices) -
+        (bigSize - smallSize));
+    if(manDiff / (2*k) > allowedErrors) {
         return 1.0f;
     }
 
-    // Sort pairs using radix-sort
+    // Sort pairs using counting-sort
     vector<IndexPair> sortedList;
-    for(std::list<IndexPair>::iterator it = pairList.begin(); it != pairList.end(); it++) {
-        MufDiffGlobals::sortedIndices[it->i1] = it->i2;
-    }
+    //list<IndexPair> sortedList;
+    /*int lastIndex = -1;
+    int counter = 0;
+    int bestCounter = 0;
+    int currStartIndex = 0;
+    int bestStartIndex = 0;*/
     for(int i = 0; i < MufDiffGlobals::sortedIndicesSize; i++) {
         if(MufDiffGlobals::sortedIndices[i] >= 0) {
-            sortedList.push_back(IndexPair(i ,MufDiffGlobals::sortedIndices[i]));
-            MufDiffGlobals::sortedIndices[i] = -1;
+            sortedList.push_back(IndexPair(i, MufDiffGlobals::sortedIndices[i]));
+            MufDiffGlobals::sortedIndices[i] = -1; // Maintain array
+
+            /*if(lastIndex < i-1) {
+                if(bestCounter < counter) {
+                    bestStartIndex = currStartIndex;
+                    bestCounter = counter;
+                }
+                currStartIndex = lastIndex = i;
+                counter = 1;
+            } else {
+                lastIndex = i;
+                counter += 1;
+            }*/
         }
     }
 
