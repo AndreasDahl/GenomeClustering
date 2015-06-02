@@ -99,7 +99,7 @@ int parseInput(int argc, char** argv) {
         // Close streams
         fastaIO.closeRead();
         out.close();
-        stats.close();
+        //stats.close();
         return 0;
     } catch (int e) {
         printHelp(argv[0]);
