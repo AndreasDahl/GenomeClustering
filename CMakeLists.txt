@@ -7,8 +7,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/out")
 set(SOURCE_FILES
     src/FastaIO.cpp
     src/FastaIO.h
-    src/KMeans.cpp
-    src/KMeans.h
     src/KMerHash.cpp
     src/KMerHash.h
     src/Main.cpp
