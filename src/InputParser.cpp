@@ -43,7 +43,7 @@ int parseInput(int argc, char** argv) {
             throw 3;
         }
 
-        GreedyClustering setup(atof(argv[3]));
+        GreedyClustering setup(1.0f - atof(argv[3]));
              
         for (int i = 4; i < argc; ++i) {
             std::string argument;
