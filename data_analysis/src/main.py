@@ -141,8 +141,15 @@ def cache_analysis():
 
     cache_total = data[:,0] + data[:,1]
     time_data = data[:,2] / 1000000
-    c = data[:,0] - data[:,1]
 
+    c = []
+    for i in range(len(data[:,0])):
+        l = data[i,0]
+        r = data[i,1]
+        if (l > r):
+            c.append((r - l) / max(data[:,1]))
+        else:
+            c.append(-(l - r) / max(data[:,0]))
 
     popt, pcov = curve_fit(pow_fit, cache_total, time_data)
 
@@ -168,7 +175,7 @@ def cache_analysis():
     plt.xlabel("Total Cache Size")
     plt.ylabel("Resulting Number of Clusters")
     plt.axis([0, 300, 0, 150000])
-    plt.scatter(cache_total, data[:,3], marker=',', c=c)
+    plt.scatter(cache_total, data[:,3], marker='o', c=c)
     fit = plt.plot(x, hyp_fit(x, *popt), c="grey",
                    label="%f/x + %f, R^2: %f" % (popt[0], popt[1], r2))
     plt.legend(handles=fit, loc=4)
