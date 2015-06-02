@@ -24,8 +24,6 @@ void GreedyClustering::start(
         FastaIO &dataIO,
         float (*dist)(FastaContainer &, FastaContainer &, float),
         std::ostream *out) {
-    std::vector<int> indexes;  // Used for data analysis
-    int c_count = 0;
     int n = 0;
     while (true) {
         // Load Sequence
@@ -74,16 +72,14 @@ void GreedyClustering::start(
 
         // Current didn't match anything and is a new cluster
         if (!isHit(bestDist)) {
-            Centroid *centroid = new Centroid(current, c_count);
+            Centroid *centroid = new Centroid(current, m_clusterCount);
             pushToCache(centroid);
 
             r.type = CENTROID;
-            r.clusterNumber = c_count;
+            r.clusterNumber = centroid->clusterNumber;
             if (out) *out << r << std::endl;
 
-            c_count++;
-            // Data collection
-            indexes.push_back(c_count);  // TODO: Work for LRU ?
+            m_clusterCount++;
         } else {  // Current hit a cluster
             Centroid *hit = *it;
             hit->count = hit->count + 1;
@@ -104,7 +100,7 @@ void GreedyClustering::start(
         }
     }
     std::cout << std::endl << "\r" << "Seq Count:" << n << std::endl;
-    std::cout << "\r" << "Cluster Count:" << c_count << std::endl;
+    std::cout << "\r" << "Cluster Count:" << m_clusterCount << std::endl;
 }
 
 void GreedyClustering::setSimilarity(float similarity) {
@@ -124,12 +120,24 @@ void GreedyClustering::setLFUSize(unsigned int newSize) {
     m_longTermCacheSize = newSize;
 }
 
+unsigned int GreedyClustering::getLRUSize() {
+    return m_cacheSize;
+}
+
+unsigned int GreedyClustering::getLFUSize() {
+    return m_longTermCacheSize;
+}
+
 float GreedyClustering::getSimilarity() {
     return m_similarity;
 }
 
 unsigned int GreedyClustering::getCacheSize() {
     return m_cacheSize + m_longTermCacheSize;
+}
+
+unsigned int GreedyClustering::getClusterCount() {
+    return m_clusterCount;
 }
 
 // Private Members ------------------------------------------------------------

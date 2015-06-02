@@ -3,6 +3,8 @@ __author__ = 'Andreas Dahl'
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib as mpl
+from scipy.optimize import curve_fit
 from collections import Counter
 
 
@@ -120,9 +122,60 @@ def analyse_comparisons2():
     print [(muf, lev) for [muf, _, lev, _] in data]
 
 
+def pow_fit(x, a, b, c):
+    return a + b * (x ** c)
+
+
+def hyp_fit(x, a, b):
+    return a / x + b
+
+
+def r_squared(expected, actual):
+    ssreg = np.sum((expected - actual) ** 2)
+    sstot = np.sum((np.mean(actual) - actual) ** 2)
+    return 1.0 - ssreg / sstot
+
+def cache_analysis():
+    data = load_data("../stats.csv", ";")
+    data = data.astype(float)
+
+    cache_total = data[:,0] + data[:,1]
+    time_data = data[:,2] / 1000000
+    c = data[:,0] - data[:,1]
+
+
+    popt, pcov = curve_fit(pow_fit, cache_total, time_data)
+
+    x = np.arange(0, 300, 1)
+
+
+    r2 = r_squared(pow_fit(cache_total, *popt), time_data)
+    print "R squared:", r2
+    plt.figure("Duration")
+    plt.xlabel("Total Cache Size")
+    plt.ylabel("Clustering Duration in seconds")
+    plt.axis([0, 300, 0, 300])
+    plt.scatter(cache_total, data[:,2] / 1000000, marker='o', c=c)
+    fit = plt.plot(x, pow_fit(x, *popt), c="grey",
+                   label="%f + %fx^%f, R^2: %f" % (popt[0], popt[1], popt[2], r2))
+    plt.legend(handles=fit, loc=4)
+    plt.gray()
+
+    popt, pcov = curve_fit(hyp_fit, cache_total, data[:,3])
+    r2 = r_squared(hyp_fit(cache_total, *popt), data[:,3])
+    print "R squared:", r2
+    plt.figure("Cluster Count")
+    plt.xlabel("Total Cache Size")
+    plt.ylabel("Resulting Number of Clusters")
+    plt.axis([0, 300, 0, 150000])
+    plt.scatter(cache_total, data[:,3], marker=',', c=c)
+    fit = plt.plot(x, hyp_fit(x, *popt), c="grey",
+                   label="%f/x + %f, R^2: %f" % (popt[0], popt[1], r2))
+    plt.legend(handles=fit, loc=4)
+
 
 
 if __name__ == "__main__":
-    analyse_comparisons2()
-
+    # analyse_comparisons2()
+    cache_analysis()
     plt.show()
