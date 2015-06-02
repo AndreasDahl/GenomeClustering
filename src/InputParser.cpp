@@ -60,7 +60,18 @@ int parseInput(int argc, char** argv) {
                 } else {
                     throw 5;
                 }
-
+            } else if (argument == "lru_size" || argument == "r") {
+                if (++i < argc) {
+                    setup.setLRUSize(atoi(argv[i]));
+                } else {
+                    throw 5;
+                }
+            } else if (argument == "lfu_size" || argument == "f") {
+                if (++i < argc) {
+                    setup.setLFUSize(atoi(argv[i]));
+                } else {
+                    throw 5;
+                }
             }
         }
         
@@ -68,10 +79,23 @@ int parseInput(int argc, char** argv) {
         setup.start(fastaIO, mufDifference, &out);
         timestamp_t t2 = get_timestamp();
         std::cout << "Execution took " << formatDuration(t1, t2) << std::endl;
+        
+        // Open stats
+        std::ofstream stats;
+        stats.open("stats.csv", std::fstream::out | std::fstream::app);
+        if (!stats.is_open()) {
+            throw 6;
+        }
+        stats << setup.getLRUSize() << ';' 
+              << setup.getLFUSize() << ';' 
+              << (t2 - t1) << ';'
+              << setup.getClusterCount() << std::endl << std::flush; 
+
 
         // Close streams
         fastaIO.closeRead();
         out.close();
+        stats.close();
         return 0;
     } catch (int e) {
         printHelp(argv[0]);

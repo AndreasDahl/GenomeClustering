@@ -41,3 +41,6 @@ CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
 Makefile
+
+# OSX
+.DS_Store
