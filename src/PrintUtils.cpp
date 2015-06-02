@@ -35,13 +35,13 @@ void printProgress(unsigned long current, unsigned long max) {
 
 std::string formatDuration(timestamp_t t0, timestamp_t t1) {
     long double seconds = (t1 - t0) / 1000000.0L;
-    //unsigned long minutes = (unsigned long) seconds / 60;
-    //seconds -= minutes * 60;
+    unsigned long minutes = (unsigned long) seconds / 60;
+    seconds -= minutes * 60;
     std::stringstream duration;
 
-    //if (minutes > 0) {
-    //    duration << minutes << "m ";
-    //}
+    if (minutes > 0) {
+        duration << minutes << "m ";
+    }
     duration << seconds << "s";
     return duration.str();
 }

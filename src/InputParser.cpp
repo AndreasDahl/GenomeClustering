@@ -91,6 +91,10 @@ int parseInput(int argc, char** argv) {
         //      << (t2 - t1) << ';'
         //      << setup.getClusterCount() << std::endl << std::flush; 
 
+        std::cout << std::endl
+            << "Clusters: " << setup.getClusterCount() << std::endl
+            << "    Time: " << formatDuration(t1, t2) << std::endl
+            << std::flush;
 
         // Close streams
         fastaIO.closeRead();
