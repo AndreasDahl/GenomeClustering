@@ -8,7 +8,6 @@
 #include <iostream>
 #include <string>
 #include <set>
-#include <regex>
 #include "InputParser.h"
 #include "MufDifference.h"
 #include "GreedyClustering.h"
@@ -17,9 +16,6 @@
 const char* HELP = {
     "usage: %s <fasta in> <cluster out> <similarity> [<args>]\n"
 };
-
-const std::regex STRING_PATTERN ("^--(.+)");
-const std::regex CHARS_PATTERN ("^-([^-])$");
 
 void printHelp(char* programName) {
     printf(HELP, programName);
@@ -47,26 +43,20 @@ int parseInput(int argc, char** argv) {
              
         for (int i = 4; i < argc; ++i) {
             std::string argument;
-            std::cmatch matches;
-            if (std::regex_match(argv[i], matches, STRING_PATTERN)
-                    || std::regex_match(argv[i], matches, CHARS_PATTERN)) {
-                argument = matches.str(1);
-            } else {
-                throw 4;
-            }
-            if (argument == "cache_size" || argument == "c") {
+            argument = argv[i];
+            if (argument == "--cache_size" || argument == "-c") {
                 if (++i < argc) {
                     setup.setCacheSize(atoi(argv[i]));
                 } else {
                     throw 5;
                 }
-            } else if (argument == "lru_size" || argument == "r") {
+            } else if (argument == "--lru_size" || argument == "-r") {
                 if (++i < argc) {
                     setup.setLRUSize(atoi(argv[i]));
                 } else {
                     throw 5;
                 }
-            } else if (argument == "lfu_size" || argument == "f") {
+            } else if (argument == "--lfu_size" || argument == "-f") {
                 if (++i < argc) {
                     setup.setLFUSize(atoi(argv[i]));
                 } else {
@@ -98,7 +88,9 @@ int parseInput(int argc, char** argv) {
         stats.close();
         return 0;
     } catch (int e) {
+        std::cout << e;
         printHelp(argv[0]);
         return e;
     }
+    return 0;
 }
