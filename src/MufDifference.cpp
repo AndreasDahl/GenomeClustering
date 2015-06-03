@@ -169,7 +169,7 @@ static int shiftingComparison(KMerHashmap& bigStruct, KMerHashmap& smallStruct, 
 }
 
 // Takes a sorted vector
-static void removeCrossingIndices(vector<IndexPair>& sortedList, int maxErrorLength)
+static void removeCrossingIndices(vector<IndexPair>& sortedList)
 {
     /*for(int i = 0; i < (int)sortedList.size(); i++) {
         cout << "(" << sortedList[i].i1 << ":" << sortedList[i].i2 << "), ";
@@ -280,7 +280,7 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
     }
 
     // Remove crossing values
-    removeCrossingIndices(sortedList, allowedErrors);
+    removeCrossingIndices(sortedList);
 
     //cout << biggest->sequence << endl << endl;
     //cout << smallest->sequence << endl << endl;
