@@ -43,13 +43,13 @@ void GreedyClustering::start(
         float bestDist = std::numeric_limits<float>::infinity();
         typename std::list<Centroid *>::iterator it;
         unsigned int i = 0;  // Used for data analysis
-        unsigned int index = 0;  // Used for data analysis
+        // (warning removal) unsigned int index = 0;  // Used for data analysis
         // Search through 'Centroids' list
         for (it = m_cache.begin(); it != m_cache.end(); ++it) {
             ++i;
             float distance = dist(*current, *(*it)->fasta, m_similarity);
             if (isHit(distance) && distance < bestDist) {
-                index = i;
+                // (warning removal) index = i;
                 bestDist = distance;
                 if (m_greedyPick)
                     break;
@@ -61,7 +61,7 @@ void GreedyClustering::start(
                 ++i;
                 float distance = dist(*current, *(*it)->fasta, m_similarity);
                 if (isHit(distance) && distance < bestDist) {
-                    index = i;
+                    // (warning removal) index = i;
                     bestDist = distance;
                     hitBig = true;
                     if (m_greedyPick)

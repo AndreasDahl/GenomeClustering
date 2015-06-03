@@ -132,7 +132,7 @@ bool KMerHashmap::iteratorNotEnded()
     return m_iteratorIndex < m_hashmapSize;
 }
 
-KMer& KMerHashmap::iteratorGet()
+KMer* KMerHashmap::iteratorGet()
 {
-    return m_iteratorNode->element;
+    return (m_iteratorIndex < m_hashmapSize) ? &m_iteratorNode->element : NULL;
 }

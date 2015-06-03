@@ -33,7 +33,7 @@ class KMerStructure
         virtual bool iteratorReset() = 0;
         virtual void iteratorIncrease() = 0;
         virtual bool iteratorNotEnded() = 0;
-        virtual T& iteratorGet() = 0;
+        virtual T* iteratorGet() = 0;
 };
 
 /**
@@ -65,7 +65,7 @@ class KMerHashmap : public KMerStructure<KMer>
         void iteratorIncrease();
         bool iteratorNotEnded();
 
-        KMer& iteratorGet();
+        KMer* iteratorGet();
 
     private:
         int m_hashmapSize;

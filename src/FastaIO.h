@@ -19,18 +19,8 @@ class FastaContainer
 			lineNumber(0)
 		{}
 
-		FastaContainer(const FastaContainer& other) :
-			sequence(other.sequence),
-			lineNumber(other.lineNumber)
-		{}
-
-		FastaContainer& operator=(const FastaContainer& other) {
-			if(&other != this) {
-				sequence = other.sequence;
-				lineNumber = other.lineNumber;
-			}
-			return *this;
-		}
+		FastaContainer(const FastaContainer& other) = delete;
+		FastaContainer& operator=(const FastaContainer& other) = delete;
 
 		std::string sequence;
 		unsigned long lineNumber;
