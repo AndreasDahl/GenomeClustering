@@ -6,15 +6,14 @@
 
 #include <stdlib.h>
 #include <string>
+#include <iostream>
+#include <list>
 
 #include "FastaIO.h"
 #include "MufDifference.h"
 #include "GreedyClustering.h"
 #include "PrintUtils.h"
 #include "InputParser.h"
-
-#include <iostream>
-#include <list>
 
 void file_test(char* file_path) {
     FastaIO fastaIO;
@@ -61,12 +60,48 @@ void distance_test(char* file_path) {
     fastaIO.closeRead();
 }
 
+void compareLevenshteinKmer(char* file_path) {
+    const unsigned int s_count = 250;
+    FastaIO fastaIO;
+    fastaIO.openRead(file_path);
+
+
+    FastaContainer seq[s_count];
+    for(unsigned int i = 0; i < s_count; i++) {
+        fastaIO.getNextLine(seq[i]);
+    }    
+
+
+    std::cout << "size " << s_count << std::flush;
+    std::ofstream myfile;
+    myfile.open ("compare.csv");
+    for (unsigned int i = 0; i < s_count - 1; ++i) {
+        printProgress(i, s_count);
+        for (unsigned int j = i + 1; j < s_count; ++j) {
+            timestamp_t t0 = get_timestamp();
+            myfile << 1.0f - mufDifference(seq[i], seq[j], 1.0f);
+            timestamp_t t1 = get_timestamp();
+            myfile << ';' << t1 - t0 << ';';
+            timestamp_t t2 = get_timestamp();
+            myfile << 1.0f - distanceLevenshteinFailFast(seq[i], seq[j], 1.0f);
+            timestamp_t t3 = get_timestamp();
+            myfile << ';' << t3 - t2;
+            myfile << std::endl;
+        }
+    }
+    std::cout.flush();
+    myfile.close();
+}
+
+
 int main(int argc, char** argv)
 {
     initializeMufDifference();
     parseInput(argc, argv);
 
     //file_test(argv[1]);
+
+    //compareLevenshteinKmer(argv[1]);
 
     uninitializeMufDifference();
     return 0;

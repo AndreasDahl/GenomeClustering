@@ -5,7 +5,7 @@ echo "BEGIN"
 for i in ${lfu[@]}; do
     for j in ${lru[@]}; do
         echo "LRU $j, LFU $i"
-        ./out/GenomeClustering res/p3_clean_C-148-2-Caecum_S128_sorted.fa clusters/clusters_mufand_${j}_${i}.uc 0.03 -r $j -f $i
+        ./out/GenomeClustering res/p3_clean_C-148-2-Caecum_S128_sorted.fa clusters/clusters_mufand_${j}_${i}.uc 0.97 -r $j -f $i
     done
 done
 echo "DONE"

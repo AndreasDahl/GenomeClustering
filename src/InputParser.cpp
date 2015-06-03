@@ -39,7 +39,7 @@ int parseInput(int argc, char** argv) {
             throw 3;
         }
 
-        GreedyClustering setup(atof(argv[3]));
+        GreedyClustering setup(1.0f - atof(argv[3]));
              
         for (int i = 4; i < argc; ++i) {
             std::string argument;
@@ -71,21 +71,25 @@ int parseInput(int argc, char** argv) {
         std::cout << "Execution took " << formatDuration(t1, t2) << std::endl;
         
         // Open stats
-        std::ofstream stats;
-        stats.open("stats.csv", std::fstream::out | std::fstream::app);
-        if (!stats.is_open()) {
-            throw 6;
-        }
-        stats << setup.getLRUSize() << ';' 
-              << setup.getLFUSize() << ';' 
-              << (t2 - t1) << ';'
-              << setup.getClusterCount() << std::endl << std::flush; 
+        //std::ofstream stats;
+        //stats.open("stats.csv", std::fstream::out | std::fstream::app);
+        //if (!stats.is_open()) {
+        //    throw 6;
+        //}
+        //stats << setup.getLRUSize() << ';' 
+        //      << setup.getLFUSize() << ';' 
+        //      << (t2 - t1) << ';'
+        //      << setup.getClusterCount() << std::endl << std::flush; 
 
+        std::cout << std::endl
+            << "Clusters: " << setup.getClusterCount() << std::endl
+            << "    Time: " << formatDuration(t1, t2) << std::endl
+            << std::flush;
 
         // Close streams
         fastaIO.closeRead();
         out.close();
-        stats.close();
+        //stats.close();
         return 0;
     } catch (int e) {
         printHelp(argv[0]);
