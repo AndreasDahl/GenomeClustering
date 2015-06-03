@@ -11,7 +11,6 @@
 void initializeMufDifference();
 void uninitializeMufDifference();
 
-float mufDifference(FastaContainer& str1, FastaContainer& str2);
 float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold);
 
 float distanceLevenshteinFailFast(FastaContainer& kMer1, FastaContainer& kMer2, float threshold);

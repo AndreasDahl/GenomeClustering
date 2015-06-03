@@ -58,7 +58,7 @@ static void reSizeSortedIndices()
 }
 
 #define MIN3(a, b, c) ((a) < (b) ? ((a) < (c) ? (a) : (c)) : ((b) < (c) ? (b) : (c)))
-static int levenshteinHelper2(const char* str1, int strSize1, const char* str2, int strSize2, int maxErrors)
+static int levenshteinHelper(const char* str1, int strSize1, const char* str2, int strSize2, int maxErrors)
 {
     if(str1 == str2 || strSize1 <= 0 || strSize2 <= 0) {
         return abs(strSize1 - strSize2);
@@ -200,11 +200,6 @@ static void removeCrossingIndices(vector<IndexPair>& sortedList, int maxErrorLen
     }
 }
 
-float mufDifference(FastaContainer& str1, FastaContainer& str2)
-{
-    return mufDifference(str1, str2, 1.0f);
-}
-
 float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
 {
     // Set k for k-mers
@@ -251,6 +246,9 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
     int manDiff = (shiftingComparison(biggest->kMerHash, smallest->kMerHash, MufDiffGlobals::sortedIndices) -
         (bigSize - smallSize));
     if(manDiff / (2*k) > allowedErrors) {
+        for(int i = 0; i < MufDiffGlobals::sortedIndicesSize; i++) {
+            MufDiffGlobals::sortedIndices[i] = -1;
+        }
         return 1.0f;
     }
 
@@ -301,7 +299,7 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
         if(it->i1-1 != lastHitB && firstHitB >= 0) { // When hit, prev index can't be hit (there must be a hole in hits)
             int missLenB = it->i1 - lastHitB;
             int missLenS = it->i2 - lastHitS;
-            difference += levenshteinHelper2(&biggest->sequence.data()[lastHitB], missLenB,
+            difference += levenshteinHelper(&biggest->sequence.data()[lastHitB], missLenB,
                                              &smallest->sequence.data()[lastHitS], missLenS,
                                              allowedErrors - difference);
 
@@ -326,7 +324,7 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
         int firstDiff = firstHitB - firstHitS;
         //cout << "Diff: " << difference << endl;
         if(firstDiff == 0 && firstHitB > 0) {
-            difference += levenshteinHelper2(&biggest->sequence.data()[0], firstHitB,
+            difference += levenshteinHelper(&biggest->sequence.data()[0], firstHitB,
                                              &smallest->sequence.data()[0], firstHitB,
                                              allowedErrors - difference);
             /*cout << "B(" << 0 << ", " << firstHitB << ") S(" << 0 << ", " << firstHitB << ")\n";
@@ -335,7 +333,7 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
             cout << "Diff: " << difference << endl << endl;*/
         }
         else if(firstDiff > 0 && firstHitS > 0) {
-            difference += levenshteinHelper2(&biggest->sequence.data()[firstDiff], firstHitS,
+            difference += levenshteinHelper(&biggest->sequence.data()[firstDiff], firstHitS,
                                              &smallest->sequence.data()[0], firstHitS,
                                              allowedErrors - difference);
             /*cout << "B(" << firstDiff << ", " << firstHitS << ") S(" << 0 << ", " << firstHitS << ")\n";
@@ -344,7 +342,7 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
             cout << "Diff: " << difference << endl << endl;*/
         }
         else if(firstDiff < 0 && firstHitB > 0) {
-            difference += levenshteinHelper2(&biggest->sequence.data()[0], firstHitB,
+            difference += levenshteinHelper(&biggest->sequence.data()[0], firstHitB,
                                              &smallest->sequence.data()[-firstDiff], firstHitB,
                                              allowedErrors - difference);
             /*cout << "B(" << 0 << ", " << firstHitB << ") S(" << -firstDiff << ", " << firstHitB << ")\n";
@@ -362,7 +360,7 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
         int endS = smallSize-lastHitS;
         int firstToEnd = (endB > endS) ? endS : endB;
         if(firstToEnd > 0) { // Should always give true, but it's better to be safe.
-            difference += levenshteinHelper2(&biggest->sequence.data()[lastHitB], firstToEnd,
+            difference += levenshteinHelper(&biggest->sequence.data()[lastHitB], firstToEnd,
                                              &smallest->sequence.data()[lastHitS], firstToEnd,
                                              allowedErrors - difference);
             if(difference > allowedErrors) {
