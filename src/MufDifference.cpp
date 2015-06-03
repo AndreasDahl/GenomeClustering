@@ -60,7 +60,7 @@ static void reSizeSortedIndices()
 #define MIN3(a, b, c) ((a) < (b) ? ((a) < (c) ? (a) : (c)) : ((b) < (c) ? (b) : (c)))
 static int levenshteinHelper(const char* str1, int strSize1, const char* str2, int strSize2, int maxErrors)
 {
-    if(str1 == str2 || strSize1 <= 0 || strSize2 <= 0) {
+    if(str1 == str2 || strSize1 <= 0 || strSize2 <= 0 || abs(strSize1 - strSize2) >= maxErrors) {
         return abs(strSize1 - strSize2);
     }
 
@@ -99,7 +99,7 @@ static int levenshteinHelper(const char* str1, int strSize1, const char* str2, i
                 currentMin = currArray[j];
         }
 
-        if(currentMin > maxErrors) { // Fail fast
+        if(currentMin >= maxErrors) { // Fail fast
             delete[] prevArray;
             delete[] currArray;
             return currentMin;
