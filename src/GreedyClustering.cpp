@@ -92,6 +92,7 @@ void GreedyClustering::start(
                 }
                 pushToCache(hit);
             }
+            delete current;
 
             r.type = HIT;
             r.clusterNumber = hit->clusterNumber;
