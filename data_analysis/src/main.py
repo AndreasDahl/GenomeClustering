@@ -96,14 +96,14 @@ def analyse_comparisons():
 
 
 def analyse_comparisons2():
-    data = load_data("res/muf_lev_silva_unfinal_200.csv", ';')
+    data = load_data("res/compare3.csv", ';')
     data = data.astype(float)
     plt.figure()
-    plt.axis([0, 1, 0, 1])
-    plt.plot([0.95, 0.95], plt.ylim(), c='r')
-    plt.plot(plt.xlim(), [0.95, 0.95])
+    plt.axis([0.8, 1, 0.8, 1])
+    plt.plot([0.95, 0.95], plt.ylim(), c='black')
+    plt.plot(plt.xlim(), [0.95, 0.95], c='black')
     plt.xlabel("levenshtein")
-    plt.ylabel("k-mer")
+    plt.ylabel("k-mer-dac")
 
     # Distance comparison
     plt.scatter(data[:, 2], data[:, 0], marker='o')
@@ -183,6 +183,6 @@ def cache_analysis():
 
 
 if __name__ == "__main__":
-    # analyse_comparisons2()
-    cache_analysis()
+    analyse_comparisons2()
+    # cache_analysis()
     plt.show()
