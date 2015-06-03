@@ -169,32 +169,64 @@ static int shiftingComparison(KMerHashmap& bigStruct, KMerHashmap& smallStruct, 
 }
 
 // Takes a sorted vector
-static void removeCrossingIndices(vector<IndexPair>& sortedList)
+void removeCrossingIndices(vector<IndexPair>& sortedList)
 {
-    /*for(int i = 0; i < (int)sortedList.size(); i++) {
-        cout << "(" << sortedList[i].i1 << ":" << sortedList[i].i2 << "), ";
-    } cout << endl << endl;*/
-
-    int last = -1;
+    int lastIndex = -1;
     for(int i = 0; i < (int)sortedList.size(); i++) {
-        int current = sortedList[i].i2;
-        if(current >= last) {
-            last = current;
-        } else { // Current is less than last
+        int currIndex = sortedList[i].i2;
+        if(currIndex >= lastIndex) {
+            lastIndex = currIndex;
+        } else { // Current is less than last, thus crossing
             int c = 1;
             while(true) {
-                if(i+c >= (int)sortedList.size() || sortedList[i+c].i2 >= last) { // Check is deleting current is a fix
+                // Check is deleting current, or the next ones, is a fix 
+                if(i+c >= (int)sortedList.size() || sortedList[i+c].i2 >= lastIndex) {
                     sortedList.erase(sortedList.begin()+i, sortedList.begin()+(i+c));
                     i -= 1; // When deleting front set index 1 back
                     break;
                 }
-                else if(i-c-1 < 0 || sortedList[i-c-1].i2 <= current) {
+                // Check is deleting previous, or ones before that, is a fix 
+                else if(i-c-1 < 0 || sortedList[i-c-1].i2 <= currIndex) {
                     sortedList.erase(sortedList.begin()+(i-c), sortedList.begin()+i);
-                    last = (i-c-1 < 0) ? -1 : sortedList[i-c-1].i2; // When deleting back set last to before deletion
+                    lastIndex = (i-c-1 < 0) ? -1 : lastIndex;
                     i -= c+1;
                     break;
                 }
                 c += 1;
+            }
+        }
+    }
+}
+
+// Takes a sorted list
+void removeCrossingIndices(list<IndexPair>& sortedList)
+{
+    int lastIndex = -1;
+    list<IndexPair>::iterator it = sortedList.begin();
+    while(it != sortedList.end()) {
+        int currIndex = it->i2;
+        if(currIndex >= lastIndex) {
+            lastIndex = currIndex;
+            it++;
+        } else { // Current is less than last, thus crossing
+            list<IndexPair>::iterator back = it; back--;
+            list<IndexPair>::iterator front = it;
+            if(back == sortedList.begin()) {
+                it = sortedList.erase(back);
+                lastIndex = -1;
+            }
+            else while(true) {
+                // Check is deleting current, or the next ones, is a fix 
+                if(++front == sortedList.end() || front->i2 >= lastIndex) {
+                    it = sortedList.erase(it, front);
+                    break;
+                }
+                // Check is deleting previous, or ones before that, is a fix 
+                else if(--back == sortedList.begin() || back->i2 <= currIndex) {
+                    lastIndex = (back == sortedList.begin()) ? -1 : currIndex;
+                    it = sortedList.erase(back, it);
+                    break;
+                }
             }
         }
     }
@@ -254,28 +286,10 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
 
     // Sort pairs using counting-sort
     vector<IndexPair> sortedList;
-    //list<IndexPair> sortedList;
-    /*int lastIndex = -1;
-    int counter = 0;
-    int bestCounter = 0;
-    int currStartIndex = 0;
-    int bestStartIndex = 0;*/
     for(int i = 0; i < MufDiffGlobals::sortedIndicesSize; i++) {
         if(MufDiffGlobals::sortedIndices[i] >= 0) {
             sortedList.push_back(IndexPair(i, MufDiffGlobals::sortedIndices[i]));
             MufDiffGlobals::sortedIndices[i] = -1; // Maintain array
-
-            /*if(lastIndex < i-1) {
-                if(bestCounter < counter) {
-                    bestStartIndex = currStartIndex;
-                    bestCounter = counter;
-                }
-                currStartIndex = lastIndex = i;
-                counter = 1;
-            } else {
-                lastIndex = i;
-                counter += 1;
-            }*/
         }
     }
 

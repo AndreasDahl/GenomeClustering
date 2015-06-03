@@ -88,7 +88,6 @@ int parseInput(int argc, char** argv) {
         stats.close();
         return 0;
     } catch (int e) {
-        std::cout << e;
         printHelp(argv[0]);
         return e;
     }
