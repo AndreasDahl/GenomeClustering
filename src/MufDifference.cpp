@@ -334,36 +334,15 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
     }
 
     if(lastHitB >= 0) {
-        // Handle sides (first)
-        int firstDiff = firstHitB - firstHitS;
-        //cout << "Diff: " << difference << endl;
-        if(firstDiff == 0 && firstHitB > 0) {
-            difference += levenshteinHelper(&biggest->sequence.data()[0], firstHitB,
-                                             &smallest->sequence.data()[0], firstHitB,
-                                             allowedErrors - difference);
-            /*cout << "B(" << 0 << ", " << firstHitB << ") S(" << 0 << ", " << firstHitB << ")\n";
-            cout << biggest->sequence.substr(0, firstHitB) << endl;
-            cout << smallest->sequence.substr(0, firstHitB) << endl;
-            cout << "Diff: " << difference << endl << endl;*/
-        }
-        else if(firstDiff > 0 && firstHitS > 0) {
-            difference += levenshteinHelper(&biggest->sequence.data()[firstDiff], firstHitS,
-                                             &smallest->sequence.data()[0], firstHitS,
-                                             allowedErrors - difference);
-            /*cout << "B(" << firstDiff << ", " << firstHitS << ") S(" << 0 << ", " << firstHitS << ")\n";
-            cout << biggest->sequence.substr(firstDiff, firstHitS) << endl;
-            cout << smallest->sequence.substr(0, firstHitS) << endl;
-            cout << "Diff: " << difference << endl << endl;*/
-        }
-        else if(firstDiff < 0 && firstHitB > 0) {
-            difference += levenshteinHelper(&biggest->sequence.data()[0], firstHitB,
-                                             &smallest->sequence.data()[-firstDiff], firstHitB,
-                                             allowedErrors - difference);
-            /*cout << "B(" << 0 << ", " << firstHitB << ") S(" << -firstDiff << ", " << firstHitB << ")\n";
-            cout << biggest->sequence.substr(0, firstHitB) << endl;
-            cout << smallest->sequence.substr(-firstDiff, firstHitB) << endl;
-            cout << "Diff: " << difference << endl << endl;*/
-        }
+        int tMin = (firstHitB < firstHitS) ? firstHitB : firstHitS;
+        difference += levenshteinHelper(&biggest->sequence.data()[firstHitB-tMin], tMin,
+                                        &smallest->sequence.data()[firstHitS-tMin], tMin,
+                                        allowedErrors - difference);
+
+        /*cout << "B(" << 0 << ", " << firstHitB << ") S(" << -firstDiff << ", " << firstHitB << ")\n";
+        cout << biggest->sequence.substr(0, firstHitB) << endl;
+        cout << smallest->sequence.substr(-firstDiff, firstHitB) << endl;
+        cout << "Diff: " << difference << endl << endl;*/
 
         if(difference > allowedErrors) {
             return 1.0f;
