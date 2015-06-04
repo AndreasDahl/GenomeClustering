@@ -15,8 +15,9 @@ class FastaContainer
 {
 	public:
 		FastaContainer() :
-			sequence(""),
-			lineNumber(0)
+            sequence(""),
+			lineNumber(0),
+            comment("")
 		{}
 
 		FastaContainer(const FastaContainer& other) = delete;
@@ -24,6 +25,8 @@ class FastaContainer
 
 		std::string sequence;
 		unsigned long lineNumber;
+
+        std::string comment;
 
 		KMerHashmap kMerHash;
 };
@@ -46,8 +49,6 @@ class FastaIO
         bool readIsOpen() const;
         bool writeIsOpen() const;
 
-        void writeAsync();
-
         int getNextLine(FastaContainer& out);
 
         unsigned long getReadFileLength() const;
@@ -61,6 +62,8 @@ class FastaIO
 
         unsigned long m_readFileLength;
         unsigned long m_bytesRead;
+
+        std::string m_readComment;
 };
 
 #endif

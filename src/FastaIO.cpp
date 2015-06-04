@@ -10,7 +10,8 @@ FastaIO::FastaIO() :
     m_writeStream(NULL),
     m_nextLineNumber(0),
     m_readFileLength(0),
-    m_bytesRead(0)
+    m_bytesRead(0),
+    m_readComment("")
 {}
 
 FastaIO::~FastaIO()
@@ -87,29 +88,31 @@ bool FastaIO::writeIsOpen() const
     return m_writeStream != NULL;
 }
 
-void FastaIO::writeAsync()
-{
-
-}
-
 int FastaIO::getNextLine(FastaContainer& out)
 {
-    std::string str;
+    if(m_readComment.size() > 0) {
+        out.comment = std::string(m_readComment, 1);
+    } else {
+        out.comment = "";
+    }
 
     out.sequence = "";
     out.lineNumber = 0;
 
-    while(std::getline(*m_readStream, str))
+    while(std::getline(*m_readStream, m_readComment))
     {
-        m_bytesRead += (long)str.size();
-        if(str[0] != '>') {
-            out.sequence += str;
+        m_bytesRead += (long)m_readComment.size();
+        if(m_readComment[0] != '>') {
+            out.sequence += m_readComment;
             if(out.lineNumber == 0) {
                 out.lineNumber = m_nextLineNumber;
             }
             m_nextLineNumber += 1;
         }
-        else if(out.sequence != "") {
+        else if(out.sequence == "") {
+            out.comment = std::string(m_readComment, 1);
+        }
+        else {
             return 0;
         }
     }

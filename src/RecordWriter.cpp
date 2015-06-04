@@ -25,9 +25,9 @@ std::ostream& operator<<(std::ostream& out, const Record& record) {
         ? out << record.id 
         : out << '*';
     out << DELIMITER;
-    out << record.query;
+    if(record.query) out << *record.query; else out << '*';
     out << DELIMITER;
-    out << record.target;
+    if(record.target) out << *record.target; else out << '*';
 
     return out;
 }

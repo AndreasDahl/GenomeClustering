@@ -33,7 +33,8 @@ void GreedyClustering::start(
             break;
         }
         // Construct record for capturing results
-        Record r;
+        Record r = Record();
+        r.query = &current->comment;
         r.sequenceLength = (current->sequence).length();
         // Output progress.
         if (++n % 500 == 0) {
@@ -92,12 +93,14 @@ void GreedyClustering::start(
                 }
                 pushToCache(hit);
             }
-            delete current;
 
+            r.target = &hit->fasta->comment;
             r.type = HIT;
             r.clusterNumber = hit->clusterNumber;
             r.id = 100 - (bestDist * 100);
             if (out) *out << r << std::endl;
+
+            delete current;
         }
     }
     std::cout << std::endl << "\r" << "Seq Count:" << n << std::endl;

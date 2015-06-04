@@ -22,8 +22,11 @@ struct Record {
     unsigned int clusterNumber;     // Cluster number.
     unsigned int sequenceLength;    // Length of the sequence.
     float id;   // Identity to the (as a percent, or * if this is a centroid).
-    std::string query;  // Fasta label of query sequence.
-    std::string target; // Fasta label of target centroid.
+    std::string* query = NULL;  // Fasta label of query sequence.
+    std::string* target = NULL; // Fasta label of target centroid.
+    /*Record() {
+        query = target = NULL;
+    }*/
 };
 
 std::ostream& operator<< (std::ostream& stream, const Record& record);
