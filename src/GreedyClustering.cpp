@@ -76,6 +76,7 @@ void GreedyClustering::start(
             Centroid *centroid = new Centroid(current, m_clusterCount);
             pushToCache(centroid);
 
+            // Finish record and output it
             r.type = CENTROID;
             r.clusterNumber = centroid->clusterNumber;
             if (out) *out << r << std::endl;
@@ -92,6 +93,7 @@ void GreedyClustering::start(
             }
             pushToCache(hit);
 
+            // Finish record and output it
             r.target = &hit->fasta->comment;
             r.type = HIT;
             r.clusterNumber = hit->clusterNumber;
