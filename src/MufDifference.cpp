@@ -1,7 +1,8 @@
 /** @file
-* @Author: Christian Muf
-* @Date:   2015-03-17 12:58:21
-*/
+ * @Author: Christian Muf
+ * @Author: Andreas Dahl
+ * @Date:   2015-03-17 12:58:21
+ */
 
 #include "MufDifference.h"
 

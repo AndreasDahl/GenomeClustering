@@ -1,7 +1,8 @@
 /** @file
-* @Author: Christian Muf
-* @Date:   2015-03-03 01:02:12
-*/
+ * @Author: Christian Muf
+ * @Author: Andreas Dahl
+ * @Date:   2015-03-03 01:02:12
+ */
 
 #include "FastaIO.h"
 

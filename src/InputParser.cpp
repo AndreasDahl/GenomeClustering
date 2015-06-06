@@ -1,7 +1,8 @@
 /* 
-* @Author: andreasdahl
-* @Date:   2015-05-21 18:47:47
-*/
+ * @Author: Andreas Dahl
+ * @Author: Christian Muf
+ * @Date:   2015-05-21 18:47:47
+ */
 
 #include <stdlib.h>
 #include <cstdio>

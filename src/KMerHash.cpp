@@ -1,7 +1,8 @@
 /** @file
-* @Author: Christian Muf
-* @Date:   2015-05-24
-*/
+ * @Author: Christian Muf
+ * @Author: Andreas Dahl
+ * @Date:   2015-05-24
+ */
 
 #include "KMerHash.h"
 

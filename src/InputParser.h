@@ -1,5 +1,7 @@
 /*
- * Created by Andreas Dahl on 23/03/15.
+ * @Author: Andreas Dahl
+ * @Author: Christian Muf
+ * @Date: 23/03/15.
  */
 
 #ifndef _GENOMECLUSTERING_INPUTPARSER_H_

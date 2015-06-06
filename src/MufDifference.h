@@ -1,7 +1,8 @@
 /** @file
-* @Author: Christian Muf
-* @Date:   2015-03-17 12:58:09
-*/
+ * @Author: Christian Muf
+ * @Author: Andreas Dahl
+ * @Date:   2015-03-17 12:58:09
+ */
 
 #ifndef MUF_DIFFERENCE
 #define MUF_DIFFERENCE
