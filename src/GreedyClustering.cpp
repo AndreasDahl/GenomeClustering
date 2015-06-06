@@ -14,7 +14,6 @@
 
 GreedyClustering::GreedyClustering(float similarity) :
     m_greedyPick(true),
-    m_lru(true),
     m_cacheSize(32),
     m_longTermCacheSize(32)
 {
@@ -85,15 +84,13 @@ void GreedyClustering::start(
         } else {  // Current hit a cluster
             Centroid *hit = *it;
             hit->count = hit->count + 1;
-            if (m_lru) {
-                // If hit in 'Clusters'
-                if (!hitBig) {
-                    m_cache.erase(it);
-                } else {
-                    m_longTermCache.erase(it);
-                }
-                pushToCache(hit);
+            
+            if (hitBig) {
+                m_longTermCache.erase(it);
+            } else {
+                m_cache.erase(it);
             }
+            pushToCache(hit);
 
             r.target = &hit->fasta->comment;
             r.type = HIT;

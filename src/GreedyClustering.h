@@ -48,7 +48,6 @@ class GreedyClustering {
 
     private:
         bool m_greedyPick = true;
-        bool m_lru = true;
         unsigned int m_cacheSize = 32;
         unsigned int m_longTermCacheSize = 32;
         float m_similarity;
