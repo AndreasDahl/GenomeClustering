@@ -29,25 +29,23 @@ class GreedyClustering {
         void start(FastaIO &dataIO, float (*dist)(FastaContainer &, FastaContainer &, float), std::ostream *out);
 
         void setSimilarity(float similarity);
-
         void setCacheSize(unsigned int newCacheSize);
-       
         void setLRUSize(unsigned int newSize);
-
         void setLFUSize(unsigned int newSize);
+        void setGreedy(bool greedy);
+        void setUsingLRU(bool shouldUseLRU);        
 
         unsigned int getLRUSize();
-        
         unsigned int getLFUSize();
-
         float getSimilarity();
-
         unsigned int getCacheSize();
-
         unsigned int getClusterCount();
+        bool isGreedy();
+        bool isUsingLRU();
 
     private:
         bool m_greedyPick = true;
+        bool m_usingLRU = true;
         unsigned int m_cacheSize = 32;
         unsigned int m_longTermCacheSize = 32;
         float m_similarity;

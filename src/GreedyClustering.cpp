@@ -14,6 +14,7 @@
 
 GreedyClustering::GreedyClustering(float similarity) :
     m_greedyPick(true),
+    m_usingLRU(true),
     m_cacheSize(32),
     m_longTermCacheSize(32)
 {
@@ -37,34 +38,35 @@ void GreedyClustering::start(
         r.query = &current->comment;
         r.sequenceLength = (current->sequence).length();
         // Output progress.
-        if (++n % 500 == 0) {
+        if (++n % 2000 == 0) {
             printProgress(dataIO.getReadFileRead(), dataIO.getReadFileLength());
         }
         bool hitBig = false;
         float bestDist = std::numeric_limits<float>::infinity();
-        typename std::list<Centroid *>::iterator it;
+        typename std::list<Centroid *>::iterator hit_it; 
         unsigned int i = 0;  // Used for data analysis
-        // (warning removal) unsigned int index = 0;  // Used for data analysis
         // Search through 'Centroids' list
-        for (it = m_cache.begin(); it != m_cache.end(); ++it) {
+        for (auto it = m_cache.begin(); it != m_cache.end(); ++it) {
             ++i;
             float distance = dist(*current, *(*it)->fasta, m_similarity);
             if (isHit(distance) && distance < bestDist) {
                 // (warning removal) index = i;
                 bestDist = distance;
+                hit_it = it;
                 if (m_greedyPick)
                     break;
             }
         }
         // Did not hit in 'Centroids'. Search though bigCents. (Or if running thorough search)
         if (!isHit(bestDist) || !m_greedyPick) {
-            for (it = m_longTermCache.begin(); it != m_longTermCache.end(); ++it) {
+            for (auto it = m_longTermCache.begin(); it != m_longTermCache.end(); ++it) {
                 ++i;
                 float distance = dist(*current, *(*it)->fasta, m_similarity);
                 if (isHit(distance) && distance < bestDist) {
                     // (warning removal) index = i;
                     bestDist = distance;
                     hitBig = true;
+                    hit_it = it;
                     if (m_greedyPick)
                         break;
                 }
@@ -83,15 +85,17 @@ void GreedyClustering::start(
 
             m_clusterCount++;
         } else {  // Current hit a cluster
-            Centroid *hit = *it;
+            Centroid *hit = *hit_it;
             hit->count = hit->count + 1;
             
-            if (hitBig) {
-                m_longTermCache.erase(it);
-            } else {
-                m_cache.erase(it);
+            if (m_usingLRU) {
+                if (hitBig) {
+                    m_longTermCache.erase(hit_it);
+                } else {
+                    m_cache.erase(hit_it);
+                }
+                pushToCache(hit);
             }
-            pushToCache(hit);
 
             // Finish record and output it
             r.target = &hit->fasta->comment;
@@ -124,6 +128,14 @@ void GreedyClustering::setLFUSize(unsigned int newSize) {
     m_longTermCacheSize = newSize;
 }
 
+void GreedyClustering::setGreedy(bool greedy) {
+    m_greedyPick = greedy;
+}
+
+void GreedyClustering::setUsingLRU(bool shouldUseLRU) {
+    m_usingLRU = shouldUseLRU;
+}
+
 unsigned int GreedyClustering::getLRUSize() {
     return m_cacheSize;
 }
@@ -142,6 +154,14 @@ unsigned int GreedyClustering::getCacheSize() {
 
 unsigned int GreedyClustering::getClusterCount() {
     return m_clusterCount;
+}
+
+bool GreedyClustering::isGreedy() {
+    return m_greedyPick;
+}
+
+bool GreedyClustering::isUsingLRU() {
+    return m_usingLRU;
 }
 
 // Private Members ------------------------------------------------------------

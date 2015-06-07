@@ -63,6 +63,10 @@ int parseInput(int argc, char** argv) {
                 } else {
                     throw 5;
                 }
+            } else if (argument == "--thorough" || argument == "-t") {
+                setup.setGreedy(false);
+            } else if (argument == "--no_lru" || argument == "-n") {
+                setup.setUsingLRU(false);
             }
         }
         
