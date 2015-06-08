@@ -1,7 +1,27 @@
+/*
+ * Copyright 2015 Andreas Dahl, Christian Muf
+ *
+ * This file is part of MufDahlClust.
+ *
+ * MufDahlClust is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MufDahlClust is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MufDahlCLust.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /* 
-* @Author: andreasdahl
-* @Date:   2015-05-21 18:47:47
-*/
+ * @Author: Andreas Dahl
+ * @Author: Christian Muf
+ * @Date:   2015-05-21 18:47:47
+ */
 
 #include <stdlib.h>
 #include <cstdio>
@@ -62,6 +82,10 @@ int parseInput(int argc, char** argv) {
                 } else {
                     throw 5;
                 }
+            } else if (argument == "--thorough" || argument == "-t") {
+                setup.setGreedy(false);
+            } else if (argument == "--no_lru" || argument == "-n") {
+                setup.setUsingLRU(false);
             }
         }
         
