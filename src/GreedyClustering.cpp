@@ -57,7 +57,7 @@ void GreedyClustering::start(
         r.query = &current->comment;
         r.sequenceLength = (current->sequence).length();
         // Output progress.
-        if (++n % 2000 == 0) {
+        if (++n % 500 == 0) {
             printProgress(dataIO.getReadFileRead(), dataIO.getReadFileLength());
         }
         bool hitBig = false;
