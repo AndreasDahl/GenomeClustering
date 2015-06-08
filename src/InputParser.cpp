@@ -35,6 +35,15 @@
 
 const char* HELP = {
     "usage: %s <fasta in> <cluster out> <similarity> [<args>]\n"
+    "\n "
+    "(--cache_size | -c) <size>\n"
+    "    Set total cache size.\n"
+    "(--lru | -r) <size>\n"
+    "    Set the size of the LRU cache.\n"
+    "    Behaviour undefined with --cache_size.\n"
+    "(--lfu | -f) <size>\n"
+    "    Set the size of the LFU cache.\n"
+    "    Behaviour undefined with --cache_size.\n"
 };
 
 void printHelp(char* programName) {
@@ -70,13 +79,13 @@ int parseInput(int argc, char** argv) {
                 } else {
                     throw 5;
                 }
-            } else if (argument == "--lru_size" || argument == "-r") {
+            } else if (argument == "--lru" || argument == "-r") {
                 if (++i < argc) {
                     setup.setLRUSize(atoi(argv[i]));
                 } else {
                     throw 5;
                 }
-            } else if (argument == "--lfu_size" || argument == "-f") {
+            } else if (argument == "--lfu" || argument == "-f") {
                 if (++i < argc) {
                     setup.setLFUSize(atoi(argv[i]));
                 } else {
@@ -117,6 +126,17 @@ int parseInput(int argc, char** argv) {
         return 0;
     } catch (int e) {
         printHelp(argv[0]);
+        switch(e) {
+            case 2:
+                std::cout << "Input file could not be opened";
+                break;
+            case 3:
+                std::cout << "Output file could not be opened";
+                break;
+            case 5:
+                std::cout << "Invalid Argument";
+                break;
+        }
         return e;
     }
     return 0;
