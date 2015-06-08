@@ -99,7 +99,7 @@ static int levenshteinHelper(const char* str1, int strSize1, const char* str2, i
                 currentMin = currArray[j];
         }
 
-        if(currentMin >= maxErrors) { // Fail fast
+        if(currentMin > maxErrors) { // Fail fast
             delete[] prevArray;
             delete[] currArray;
             return currentMin;
@@ -376,10 +376,10 @@ float mufDifference(FastaContainer& str1, FastaContainer& str2, float threshold)
     return (float)(difference) / (float)smallSize;
 }
 
-float distanceLevenshteinFailFast(FastaContainer& kMer1, FastaContainer& kMer2, float threshold)
+float distanceLevenshteinFailFast(FastaContainer& seq1, FastaContainer& seq2, float threshold)
 {
-    std::string str1 = kMer1.sequence;
-    std::string str2 = kMer2.sequence;
+    std::string str1 = seq1.sequence;
+    std::string str2 = seq2.sequence;
     // degenerate cases
     if (&str1 == &str2) return 0.0f;
     if (str1.length() == 0) return str2.length();
@@ -443,3 +443,53 @@ float distanceLevenshteinFailFast(FastaContainer& kMer1, FastaContainer& kMer2, 
     return (float)(result - lengthDiff) / smallestLength;
 }
 
+float pureKMer(FastaContainer& kMer1, FastaContainer& kMer2, float threshold)
+{
+    const int k = 8;
+
+    int smallSize = (kMer1.sequence.size() < kMer2.sequence.size()) ?
+                     kMer1.sequence.size() : kMer2.sequence.size();
+    int allowedErrors = (int)ceil((float)smallSize * threshold) * k * 2;
+
+    if(!kMer1.kMerHash.isCreated()) {
+        kMer1.kMerHash.createHashMap((int)kMer1.sequence.size(), k<<1);
+        generateHashKmer(kMer1.sequence, kMer1.kMerHash, k);
+    }
+    if(!kMer2.kMerHash.isCreated()) {
+        kMer2.kMerHash.createHashMap((int)kMer2.sequence.size(), k<<1);
+        generateHashKmer(kMer2.sequence, kMer2.kMerHash, k);
+    }
+
+    kMer1.kMerHash.iteratorReset();
+    kMer2.kMerHash.iteratorReset();
+
+    int difference = 0;
+    while(kMer1.kMerHash.iteratorNotEnded() && kMer2.kMerHash.iteratorNotEnded()) {
+        KMer* t1 = kMer1.kMerHash.iteratorGet();
+        KMer* t2 = kMer2.kMerHash.iteratorGet();
+        if(t1->value == t2->value) {
+            kMer1.kMerHash.iteratorIncrease();
+            kMer2.kMerHash.iteratorIncrease();
+        }
+        else {
+            if(++difference > allowedErrors) return 1.0f;
+            if(t1->value < t2->value) {
+                kMer1.kMerHash.iteratorIncrease();
+            }
+            else { // t1 > t2
+                kMer2.kMerHash.iteratorIncrease();
+            }
+        }
+    }
+
+    while(kMer1.kMerHash.iteratorNotEnded()) {
+        if(++difference > allowedErrors) return 1.0f;
+        kMer1.kMerHash.iteratorIncrease();
+    }
+    while(kMer2.kMerHash.iteratorNotEnded()) {
+        if(++difference > allowedErrors) return 1.0f;
+        kMer2.kMerHash.iteratorIncrease();
+    }
+
+    return (float)difference / (float)smallSize;
+}
