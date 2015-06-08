@@ -155,7 +155,7 @@ def r_squared(expected, actual):
     return 1.0 - ssreg / sstot
 
 def cache_analysis():
-    data = load_data("../stats.csv", ";")
+    data = load_data("res/stats.csv", ";")
     data = data.astype(float)
 
     cache_total = data[:,0] + data[:,1]
