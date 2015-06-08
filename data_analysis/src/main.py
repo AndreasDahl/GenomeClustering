@@ -194,14 +194,24 @@ def cache_analysis():
     plt.xlabel("Total Cache Size")
     plt.ylabel("Resulting Number of Clusters")
     plt.axis([0, 300, 0, 150000])
-    plt.scatter(cache_total, data[:,3], marker='o', c=c)
+    plt.scatter(cache_total, data[:,3], marker='o')
     fit = plt.plot(x, hyp_fit(x, *popt), c="grey",
-                   label="%f/x + %f, R^2: %f" % (popt[0], popt[1], r2))
-    plt.legend(handles=fit, loc=4)
+                   label="%.02f/x + %.02f,  R^2: %.02f" % (popt[0], popt[1], r2))
+    plt.legend(handles=fit, loc=1)
+
+
+def cluster_quality():
+    data = load_data("res/caecum.uc", "\t")
+    clusters = data[:,1].astype(int)
+
+    labels, values = zip(*Counter(clusters).items())
+
+    plt.hist(values, 100)
 
 
 
 if __name__ == "__main__":
-    analyse_comparisons2()
-    # cache_analysis()
+    # analyse_comparisons2()
+    cache_analysis()
+    # cluster_quality()
     plt.show()
