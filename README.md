@@ -12,7 +12,7 @@
 ```
 usage: ./out/GenomeClustering <fasta in> <cluster out> <similarity> [<args>]
 
- (--cache_size | -c) <size>
+(--cache_size | -c) <size>
     Set total cache size.
 (--lru | -r) <size>
     Set the size of the LRU cache.
